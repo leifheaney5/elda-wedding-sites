@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+{% block title %}Vendors{% endblock %}
+{% block admin_content %}
+<section class="mb-8">
+  <div class="flex items-end justify-between gap-3 mb-4">
+    <div>
+      <h1 class="font-serif text-4xl text-bbb-navy">Vendor Command Center</h1>
+      <p class="text-sm text-gray-500">Marketplace oversight across onboarding, pipeline, and payouts.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <article class="bg-white rounded-2xl p-5 border border-gray-100"><p class="text-xs uppercase text-gray-500">Total Vendors</p><p class="font-serif text-3xl text-bbb-navy">{{ vendor_count }}</p></article>
+    <article class="bg-white rounded-2xl p-5 border border-gray-100"><p class="text-xs uppercase text-gray-500">Active Vendors</p><p class="font-serif text-3xl text-bbb-navy">{{ active_count }}</p></article>
+    <article class="bg-white rounded-2xl p-5 border border-gray-100"><p class="text-xs uppercase text-gray-500">Gross Processed</p><p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(total_gross_dollars) }}</p></article>
+    <article class="bg-white rounded-2xl p-5 border border-gray-100"><p class="text-xs uppercase text-gray-500">Vendor Net</p><p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(total_net_dollars) }}</p></article>
+  </div>
+
+  <article class="bg-white rounded-2xl p-6 border border-gray-100 overflow-auto">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Vendor Portfolio</h2>
+    <table class="w-full text-sm min-w-[980px]">
+      <thead>
+        <tr class="text-left text-gray-500 border-b border-gray-200">
+          <th class="py-2 pr-3">Vendor</th>
+          <th class="py-2 pr-3">Status</th>
+          <th class="py-2 pr-3">Packages</th>
+          <th class="py-2 pr-3">Leads</th>
+          <th class="py-2 pr-3">Quotes</th>
+          <th class="py-2 pr-3">Bookings</th>
+          <th class="py-2 pr-3">Gross</th>
+          <th class="py-2 pr-3">Net</th>
+          <th class="py-2 pr-3">Connect</th>
+          <th class="py-2 pr-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in vendor_rows %}
+        <tr class="border-b border-gray-100">
+          <td class="py-3 pr-3">
+            <p class="font-semibold text-bbb-navy">{{ row.vendor.business_name }}</p>
+            <p class="text-xs text-gray-500">{{ row.vendor.slug }}</p>
+          </td>
+          <td class="py-3 pr-3">
+            <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold
+              {% if row.vendor.status == 'active' %}bg-green-100 text-green-800{% elif row.vendor.status == 'suspended' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-700{% endif %}">
+              {{ row.vendor.status.title() }}
+            </span>
+          </td>
+          <td class="py-3 pr-3">{{ row.package_count }}</td>
+          <td class="py-3 pr-3">{{ row.lead_count }}</td>
+          <td class="py-3 pr-3">{{ row.quote_count }}</td>
+          <td class="py-3 pr-3">{{ row.booking_count }}</td>
+          <td class="py-3 pr-3">${{ '%.2f'|format(row.gross_cents / 100) }}</td>
+          <td class="py-3 pr-3">${{ '%.2f'|format(row.net_cents / 100) }}</td>
+          <td class="py-3 pr-3">
+            {% if row.payout %}
+            <span class="text-xs {% if row.payout.payouts_enabled %}text-green-700{% else %}text-amber-700{% endif %}">
+              {{ row.payout.onboarding_status|replace('_', ' ')|title }}
+            </span>
+            {% else %}
+            <span class="text-xs text-gray-500">Not connected</span>
+            {% endif %}
+          </td>
+          <td class="py-3 pr-3">
+            <a href="{{ url_for('admin.vendor_detail', vendor_id=row.vendor.id) }}" class="text-bbb-teal hover:underline">Open</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td class="py-6 text-gray-500" colspan="10">No vendors yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </article>
+</section>
+{% endblock %}

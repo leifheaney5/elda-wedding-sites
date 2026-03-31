@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Create Client Account{% endblock %}
+{% block content %}
+{% set hero_script_line = "Client Portal" %}
+{% set hero_title = "Create Your Account" %}
+{% set hero_subtitle = "Start your private wedding planning workspace in under a minute." %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-gradient-to-b from-bbb-cream via-[#faf8f5] to-white">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6">
+    <article class="rounded-3xl border border-bbb-sand bg-white p-7 shadow-sm">
+      <p class="text-xs uppercase tracking-[0.2em] text-bbb-teal font-semibold mb-3">Quick Setup</p>
+      <h2 class="font-serif text-3xl text-bbb-navy mb-3">What happens next</h2>
+      <ol class="space-y-2 text-sm text-gray-700 list-decimal pl-4">
+        <li>Create your account with your preferred planning email.</li>
+        <li>Submit or review your booking/service requests.</li>
+        <li>Use your plan and inspiration tools anytime.</li>
+      </ol>
+      <div class="mt-5 rounded-2xl bg-bbb-cream p-4 text-sm text-gray-700">
+        For best auto-linking of records, use the same email you submit on forms.
+      </div>
+    </article>
+
+    <article class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">Create Client Account</h2>
+      <p class="text-sm text-gray-600 mb-6">Set up secure access to your planning dashboard.</p>
+
+      <a href="{{ url_for('client.auth_google') }}"
+         class="mb-5 w-full inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream text-bbb-navy font-semibold">
+        Sign up with Google
+      </a>
+      {% if not google_enabled %}
+      <p class="mb-4 text-xs text-gray-500">Google account sign-up appears after OAuth is configured by admin.</p>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('client.register') }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div>
+          <label class="form-label" for="full_name">Full Name</label>
+          <input class="form-input" id="full_name" name="full_name" type="text" />
+        </div>
+        <div>
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" id="email" name="email" type="email" required />
+        </div>
+        <div>
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" id="password" name="password" type="password" minlength="8" required />
+        </div>
+        <div>
+          <label class="form-label" for="confirm_password">Confirm Password</label>
+          <input class="form-input" id="confirm_password" name="confirm_password" type="password" minlength="8" required />
+        </div>
+        <button type="submit" class="w-full px-5 py-3 rounded-full bg-bbb-teal text-white font-semibold hover:bg-bbb-teal-dark">
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-sm text-gray-600 mt-6">
+        Already have an account?
+        <a href="{{ url_for('client.login') }}" class="text-bbb-teal font-semibold">Sign in</a>
+      </p>
+    </article>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Ceremony Package A{% endblock %}
+
+{% block content %}
+{% set hero_script_line = "Template Package" %}
+{% set hero_title = "Ceremony Package A" %}
+{% set hero_subtitle = "Private ceremony template with a clean, minimal service structure." %}
+{% set hero_cta_label = "Book This Package" %}
+{% set hero_cta_url = url_for('booking.service_request', request_type='package') + '?service=package-a' %}
+{% set hero_bg = url_for('static', filename='images/packages/elopement.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl shadow-sm p-8 sm:p-12">
+      <p class="font-script text-3xl text-bbb-teal mb-4">What's Included</p>
+      <div class="w-16 h-0.5 bg-bbb-gold mb-8"></div>
+      <p class="font-sans text-gray-600 leading-relaxed mb-8">
+        This template package supports a private ceremony flow with core planning and day-of
+        structure. It is intentionally generic so teams can adapt details, inclusions, and
+        service language for their own offering model.
+      </p>
+
+      <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        {% set includes = [
+          "Licensed officiant",
+          "Professional photographer (1 hour)",
+          "Ceremony location coordination",
+          "Legal paperwork filing",
+          "Complimentary bouquet & boutonniere",
+          "Personalized ceremony script",
+          "24-hour planning portal access",
+          "Day-of coordination",
+        ] %}
+        {% for item in includes %}
+        <li class="flex items-center gap-3 font-sans text-gray-700">
+          <svg class="w-5 h-5 text-bbb-teal flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          {{ item }}
+        </li>
+        {% endfor %}
+      </ul>
+
+      <div class="bg-bbb-sand rounded-2xl p-6 mb-8">
+        <p class="font-script text-2xl text-bbb-teal mb-1">Pricing</p>
+        <p class="font-serif text-4xl font-bold text-bbb-navy">Custom Quote</p>
+        <p class="font-sans text-sm text-gray-500 mt-2">Seasonal and date-based pricing. Contact us for availability.</p>
+      </div>
+
+      <a href="{{ url_for('booking.service_request', request_type='package') }}?service=package-a"
+         class="inline-block px-10 py-4 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors shadow-md">
+        Book This Package
+      </a>
+    </div>
+  </div>
+</section>
+
+{% include 'components/cta_banner.html' %}
+{% endblock %}

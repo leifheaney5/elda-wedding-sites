@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% block title %}Service Requests{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Service Requests</h1>
+  <a href="{{ url_for('admin.export_service_requests_csv') }}" class="px-4 py-2 text-sm rounded-full border border-bbb-teal text-bbb-teal">Export CSV</a>
+</div>
+
+<form method="GET" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-3 max-w-5xl">
+  <label for="service-search" class="sr-only">Search service requests</label>
+  <input id="service-search" type="text" name="q" value="{{ q }}" placeholder="Search name, email, service" class="form-input sm:col-span-2" />
+  <label for="service-type" class="sr-only">Filter by request type</label>
+  <select id="service-type" class="form-input" name="type">
+    <option value="">All request types</option>
+    {% for t in types %}
+    <option value="{{ t }}" {% if request_type == t %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+  <label for="service-status" class="sr-only">Filter by request status</label>
+  <select id="service-status" class="form-input" name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}
+    <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>
+      {% if s == 'open' %}open (new + reviewing){% else %}{{ s }}{% endif %}
+    </option>
+    {% endfor %}
+  </select>
+  <button class="px-4 py-2 text-sm rounded-full bg-bbb-teal text-white sm:col-span-4 sm:justify-self-start">Apply Filters</button>
+</form>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Name</th>
+        <th class="px-4 py-3">Type</th>
+        <th class="px-4 py-3">Service</th>
+        <th class="px-4 py-3">Date</th>
+        <th class="px-4 py-3">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in requests_page.items %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3"><a class="text-bbb-teal" href="{{ url_for('admin.service_request_detail', id=item.id) }}">{{ item.name }}</a></td>
+        <td class="px-4 py-3">{{ item.request_type }}</td>
+        <td class="px-4 py-3">{{ item.selected_service or "-" }}</td>
+        <td class="px-4 py-3">{{ item.event_date or "-" }}</td>
+        <td class="px-4 py-3">{{ item.status }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="px-4 py-6 text-gray-500" colspan="5">No service requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if requests_page.pages > 1 %}
+<div class="flex items-center gap-2 mt-4">
+  {% for p in range(1, requests_page.pages + 1) %}
+  <a class="px-3 py-1 rounded border text-sm {% if p == requests_page.page %}bg-bbb-navy text-white border-bbb-navy{% else %}bg-white border-gray-300{% endif %}"
+     href="{{ url_for('admin.service_requests', page=p, q=q or None, type=request_type or None, status=status_filter or None) }}">{{ p }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

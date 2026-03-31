@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Client Login{% endblock %}
+{% block content %}
+{% set hero_script_line = "Client Portal" %}
+{% set hero_title = "Client Login" %}
+{% set hero_subtitle = "A private, elegant workspace for your wedding planning journey." %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-gradient-to-b from-bbb-cream via-[#faf8f5] to-white">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6">
+    <article class="rounded-3xl border border-bbb-sand bg-white p-7 shadow-sm">
+      <p class="text-xs uppercase tracking-[0.2em] text-bbb-teal font-semibold mb-3">Portal Benefits</p>
+      <h2 class="font-serif text-3xl text-bbb-navy mb-3">Luxury planning, simplified</h2>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li>• Track tasks, key dates, and milestones</li>
+        <li>• Review selections, requests, and payments</li>
+        <li>• Save your inspiration board for your planning team</li>
+        <li>• Keep every communication in one place</li>
+      </ul>
+      <div class="mt-5 rounded-2xl bg-bbb-cream p-4 text-sm text-gray-700">
+        Use the same email from your booking request for automatic account linking.
+      </div>
+    </article>
+
+    <article class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">Welcome Back</h2>
+      <p class="text-sm text-gray-600 mb-6">Sign in with Google or your email account.</p>
+
+      {% if google_enabled %}
+      <a href="{{ url_for('client.auth_google') }}"
+         class="mb-5 w-full inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream text-bbb-navy font-semibold">
+        Continue with Google
+      </a>
+      {% else %}
+      <p class="mb-5 text-xs text-gray-500">Google login appears once OAuth credentials are configured.</p>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('client.login') }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div>
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" id="email" name="email" type="email" required />
+        </div>
+        <div>
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" id="password" name="password" type="password" required />
+        </div>
+        <div class="text-right">
+          <a href="{{ url_for('client.forgot_password') }}" class="text-sm text-bbb-teal font-semibold">Forgot password?</a>
+        </div>
+        <label class="inline-flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" name="remember" />
+          Keep me signed in
+        </label>
+        <button type="submit" class="w-full px-5 py-3 rounded-full bg-bbb-teal text-white font-semibold hover:bg-bbb-teal-dark">
+          Sign In
+        </button>
+      </form>
+
+      <p class="text-sm text-gray-600 mt-6">
+        {% if client_self_registration_enabled %}
+        New here?
+        <a href="{{ url_for('client.register') }}" class="text-bbb-teal font-semibold">Create your client account</a>
+        {% else %}
+        Need portal access?
+        <a href="{{ url_for('contact.contact') }}" class="text-bbb-teal font-semibold">Request an invitation</a>
+        {% endif %}
+      </p>
+    </article>
+  </div>
+</section>
+{% endblock %}

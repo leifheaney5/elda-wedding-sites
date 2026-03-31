@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Booking Detail{% endblock %}
+{% block admin_content %}
+<div class="flex flex-wrap items-center gap-3">
+  <a class="text-sm text-bbb-teal" href="{{ url_for('admin.bookings') }}">&larr; Back to bookings</a>
+  {% if planning_client_id %}
+  <a class="text-sm text-bbb-teal font-semibold" href="{{ url_for('admin.planning_ops', client_id=planning_client_id) }}">Open Planning Ops</a>
+  {% endif %}
+</div>
+<div class="bg-white rounded-2xl shadow-sm p-6 mt-4">
+  <h1 class="font-serif text-3xl text-bbb-navy mb-2">{{ booking.couple_name }}</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ booking.email }}{% if booking.phone %} • {{ booking.phone }}{% endif %}</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+    <p><strong>Package:</strong> {{ booking.package_id or "-" }}</p>
+    <p><strong>Wedding Date:</strong> {{ booking.wedding_date or "-" }}</p>
+    <p><strong>Guest Count:</strong> {{ booking.guest_count or "-" }}</p>
+    <p><strong>Ceremony Time:</strong> {{ booking.ceremony_time or "-" }}</p>
+    <p><strong>Venue Preference:</strong> {{ booking.venue_preference or "-" }}</p>
+    <p><strong>Status:</strong> {{ booking.status }}</p>
+  </div>
+  {% if booking.special_requests %}
+  <div class="mt-4">
+    <p class="text-sm font-semibold">Special Requests</p>
+    <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ booking.special_requests }}</p>
+  </div>
+  {% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Update Status</h2>
+    <form method="POST" action="{{ url_for('admin.booking_status', id=booking.id) }}" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <label for="booking-status" class="sr-only">Booking status</label>
+      <select id="booking-status" class="form-input" name="status">
+        <option value="new" {% if booking.status == 'new' %}selected{% endif %}>new</option>
+        <option value="reviewing" {% if booking.status == 'reviewing' %}selected{% endif %}>reviewing</option>
+        <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>confirmed</option>
+        <option value="cancelled" {% if booking.status == 'cancelled' %}selected{% endif %}>cancelled</option>
+      </select>
+      <button class="px-6 py-2 bg-bbb-teal text-white rounded-full">Update</button>
+    </form>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Admin Notes</h2>
+    <form method="POST" action="{{ url_for('admin.booking_notes', id=booking.id) }}" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <label for="booking-notes" class="sr-only">Booking admin notes</label>
+      <textarea id="booking-notes" class="form-input resize-none" name="notes" rows="4">{{ booking.admin_notes or '' }}</textarea>
+      <button class="px-6 py-2 bg-bbb-teal text-white rounded-full">Save Notes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

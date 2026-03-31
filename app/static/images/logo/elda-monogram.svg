@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">ELDA Monogram</title>
+  <desc id="desc">Interlocking ring monogram with ELDA letterform.</desc>
+  <defs>
+    <linearGradient id="eldaMonoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DCC08A"/>
+      <stop offset="100%" stop-color="#B38B4E"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="94" cy="120" r="55" stroke="#1A2E44" stroke-width="10"/>
+    <circle cx="146" cy="120" r="55" stroke="url(#eldaMonoGold)" stroke-width="10"/>
+    <path d="M84 93h19c14 0 24 4 31 11 6 6 9 13 9 21 0 10-4 19-11 26-8 6-18 10-31 10H84V93zm14 12v43h2c8 0 14-2 19-6 4-4 7-9 7-16 0-6-3-11-7-15-5-4-11-6-19-6h-2z" fill="#1A2E44"/>
+  </g>
+</svg>

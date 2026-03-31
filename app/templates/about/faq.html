@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}FAQ{% endblock %}
+{% block meta_desc %}Get answers to common wedding questions about permits, timing, payments, planning process, catering options, and logistics.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Common Questions" %}
+{% set hero_title = "FAQ" %}
+{% set hero_subtitle = "Quick answers about planning, booking, and wedding day logistics." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+    {% for item in faqs %}
+    <article class="bg-white rounded-2xl p-6 shadow-sm">
+      <h2 class="font-serif text-2xl text-bbb-navy mb-2">{{ item.question }}</h2>
+      <p class="text-sm text-gray-600 leading-relaxed">{{ item.answer }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

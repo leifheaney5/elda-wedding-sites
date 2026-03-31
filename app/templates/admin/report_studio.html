@@ -1,0 +1,141 @@
+{% extends "admin/base.html" %}
+{% block title %}Report Studio{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-serif text-4xl text-bbb-navy">Report Studio</h1>
+    <p class="text-sm text-gray-500">Build custom operational reports with selected fields, filters, and visual style.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('admin.report_studio_export_csv', dataset=dataset, fields=selected_fields|join(','), status=status_filter, date_start=date_start, date_end=date_end, viz_type=viz_type) }}" class="px-4 py-2 rounded-full border border-bbb-teal text-bbb-teal">Export CSV</a>
+    <a href="{{ url_for('admin.report_studio_export_document', dataset=dataset, fields=selected_fields|join(','), status=status_filter, date_start=date_start, date_end=date_end, viz_type=viz_type) }}" class="px-4 py-2 rounded-full bg-bbb-teal text-white">Export Document</a>
+  </div>
+</div>
+
+<section class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+  <form method="POST" action="{{ url_for('admin.report_studio') }}" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label for="dataset" class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Dataset</label>
+        <select id="dataset" name="dataset" class="w-full rounded-lg border border-gray-300 px-3 py-2">
+          {% for item in datasets %}
+          <option value="{{ item.value }}" {% if item.value == dataset %}selected{% endif %}>{{ item.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="status" class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Status Filter</label>
+        <select id="status" name="status" class="w-full rounded-lg border border-gray-300 px-3 py-2">
+          {% for option in report.status_options %}
+          <option value="{{ option }}" {% if option == status_filter %}selected{% endif %}>{{ option.title() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="viz_type" class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Visualization</label>
+        <select id="viz_type" name="viz_type" class="w-full rounded-lg border border-gray-300 px-3 py-2">
+          <option value="daily_volume" {% if viz_type == 'daily_volume' %}selected{% endif %}>Daily Volume</option>
+          <option value="status_breakdown" {% if viz_type == 'status_breakdown' %}selected{% endif %}>Status Breakdown</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="date_start" class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Start Date</label>
+        <input id="date_start" type="date" name="date_start" value="{{ date_start }}" class="w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+      <div>
+        <label for="date_end" class="block text-xs uppercase tracking-wide text-gray-500 mb-1">End Date</label>
+        <input id="date_end" type="date" name="date_end" value="{{ date_end }}" class="w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+    </div>
+
+    <div>
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Fields</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+        {% for field_key, field_label in dataset_meta.available_fields.items() %}
+        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" name="fields" value="{{ field_key }}" {% if field_key in selected_fields %}checked{% endif %} />
+          {{ field_label }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button name="action" value="generate" class="px-5 py-2 rounded-full bg-bbb-navy text-white">Generate Report</button>
+      <label for="template_name" class="sr-only">Template Name</label>
+      <input id="template_name" type="text" name="template_name" placeholder="Template name" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+      <button type="submit" name="action" value="save-template" class="px-4 py-2 rounded-full border border-bbb-teal text-bbb-teal">Save Template</button>
+    </div>
+  </form>
+</section>
+
+<section class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+  <h2 class="font-serif text-2xl text-bbb-navy mb-3">Saved Templates</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    {% for template in templates %}
+    <a href="{{ url_for('admin.report_studio', template_id=template.id) }}" class="block rounded-xl border px-4 py-3 hover:bg-bbb-cream {% if selected_template_id == template.id %}border-bbb-teal{% else %}border-gray-200{% endif %}">
+      <p class="font-semibold text-sm text-bbb-navy">{{ template.name }}</p>
+      <p class="text-xs text-gray-500 mt-1">{{ template.dataset.replace('_', ' ').title() }} • {{ template.updated_at.strftime('%Y-%m-%d') if template.updated_at else '' }}</p>
+    </a>
+    {% else %}
+    <p class="text-sm text-gray-500">No templates saved yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+  <article class="bg-white rounded-2xl border border-gray-100 p-5">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Rows Returned</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ report.row_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl border border-gray-100 p-5 xl:col-span-2">
+    <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Visualization Snapshot</p>
+    <div class="space-y-2">
+      {% for point in report.viz_points[:8] %}
+      <div class="grid grid-cols-[180px_1fr_70px] items-center gap-3">
+        <span class="text-xs text-gray-600 truncate">{{ point.label }}</span>
+        <progress class="w-full h-2 [&::-webkit-progress-bar]:rounded [&::-webkit-progress-value]:bg-bbb-teal" max="{{ report.viz_points | map(attribute='value') | max if report.viz_points else 1 }}" value="{{ point.value }}"></progress>
+        <span class="text-xs text-gray-600 text-right">{{ point.value }}</span>
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-500">No visualization points for this filter set.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+  <div class="px-5 py-4 border-b border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy">Report Rows</h2>
+  </div>
+  <div class="overflow-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-bbb-cream text-left">
+        <tr>
+          {% for field in report.selected_fields %}
+          <th class="px-4 py-3">{{ report.field_labels[field] }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in report.rows %}
+        <tr class="border-t border-gray-100">
+          {% for field in report.selected_fields %}
+          <td class="px-4 py-3">{{ row[field] }}</td>
+          {% endfor %}
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="{{ report.selected_fields|length }}" class="px-4 py-6 text-center text-gray-500">No rows matched your filters.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,66 @@
+{#
+  Reusable hero component.
+  Variables:
+    hero_title       — main heading (supports HTML/script font span)
+    hero_subtitle    — subheading text
+    hero_cta_label   — primary CTA button text
+    hero_cta_url     — primary CTA URL
+    hero_cta2_label  — (optional) secondary CTA text
+    hero_cta2_url    — (optional) secondary CTA URL
+    hero_bg          — (optional) path to background image
+    hero_overlay     — (optional) bool, default true
+#}
+<section class="relative flex items-center justify-center min-h-[62vh] sm:min-h-[75vh] lg:min-h-[85vh] overflow-hidden"
+  {% if not hero_bg %}
+  style="background: linear-gradient(135deg, #1A2E44 0%, #4A9B8E 100%);"
+  {% endif %}>
+
+  {% if hero_bg %}
+  <img
+    src="{{ hero_bg }}"
+    alt="{{ hero_bg_alt if hero_bg_alt is defined else 'Wedding backdrop' }}"
+    class="absolute inset-0 h-full w-full object-cover"
+    {% if hero_lcp %}fetchpriority="high"{% endif %}
+    loading="eager"
+    decoding="async"
+  />
+  {% endif %}
+
+  {% if hero_overlay is not defined or hero_overlay %}
+  <div class="absolute inset-0 bg-bbb-navy/55"></div>
+  {% endif %}
+  <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+    {% if hero_script_line %}
+    <p class="font-script text-3xl sm:text-4xl text-bbb-gold mb-2">{{ hero_script_line }}</p>
+    {% endif %}
+    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+      {{ hero_title | safe }}
+    </h1>
+    {% if hero_subtitle %}
+    <p class="font-sans text-lg sm:text-xl text-white/85 max-w-2xl mx-auto mb-8 leading-relaxed">
+      {{ hero_subtitle }}
+    </p>
+    {% endif %}
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      {% if hero_cta_label and hero_cta_url %}
+      <a href="{{ hero_cta_url }}"
+         class="px-8 py-3.5 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full text-base transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+        {{ hero_cta_label }}
+      </a>
+      {% endif %}
+      {% if hero_cta2_label and hero_cta2_url %}
+      <a href="{{ hero_cta2_url }}"
+         class="px-8 py-3.5 border-2 border-white/70 hover:border-white text-white font-semibold rounded-full text-base transition-all hover:bg-white/10">
+        {{ hero_cta2_label }}
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 animate-bounce hidden sm:block">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </div>
+</section>

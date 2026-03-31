@@ -1,0 +1,359 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block admin_content %}
+<section class="mb-8">
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+    <div>
+      <h1 class="font-serif text-4xl text-bbb-navy">Owner Dashboard</h1>
+      <p class="text-sm text-gray-500">Real-time operations, sales, and planning visibility.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <form method="GET" action="{{ url_for('admin.dashboard') }}" class="flex items-center gap-2">
+        <label for="window" class="text-xs uppercase tracking-wide text-gray-500">Trend Window</label>
+        <select id="window" name="window" class="rounded-lg border border-gray-300 px-2 py-1 text-sm">
+          {% for option in trend_window_options %}
+          <option value="{{ option.value }}" {% if option.value == selected_window %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+        <button class="px-3 py-1 rounded-full bg-bbb-teal text-white text-sm">Apply</button>
+      </form>
+      <div class="text-xs text-gray-500">Updated {{ now.strftime("%Y-%m-%d %H:%M UTC") }}</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500">Total Leads</p>
+      <p class="font-serif text-3xl text-bbb-navy">{{ stats.total_contacts + stats.total_bookings + stats.service_requests }}</p>
+    </article>
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500">Unread Contacts</p>
+      <p class="font-serif text-3xl text-bbb-navy">{{ stats.unread_contacts }}</p>
+    </article>
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500">New Bookings</p>
+      <p class="font-serif text-3xl text-bbb-navy">{{ stats.new_bookings }}</p>
+    </article>
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500">Paid Revenue</p>
+      <p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(stats.total_revenue_cents / 100) }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Lead to Booking</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ lead_to_booking_rate }}%</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Booking Confirm Rate</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ booking_confirm_rate }}%</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Avg Paid Transaction</p>
+    <p class="font-serif text-2xl text-bbb-navy">${{ '%.2f'|format(avg_paid_ticket_dollars) }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Avg Days to Wedding</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ avg_days_to_wedding if avg_days_to_wedding else 'N/A' }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Top Service Interest</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ top_service_type }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Pending Revenue</p>
+    <p class="font-serif text-2xl text-bbb-navy">${{ '%.2f'|format(stats.pending_revenue_cents / 100) }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Open Service Requests</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ open_service_requests }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Weddings in 30 Days</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ upcoming_weddings_30 }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Failed Transactions</p>
+    <p class="font-serif text-2xl text-bbb-navy">{{ stats.failed_payments }}</p>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+  <article class="xl:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="font-serif text-2xl text-bbb-navy">Operations Command Center</h2>
+        <p class="text-xs text-gray-500 mt-1">Priority-sorted queue for the next best admin actions.</p>
+      </div>
+      <span class="inline-flex items-center rounded-full bg-bbb-cream px-3 py-1 text-xs font-semibold text-bbb-navy">
+        High Priority: {{ high_priority_count }}
+      </span>
+    </div>
+    <div class="space-y-3 max-h-[22rem] overflow-auto pr-1">
+      {% for item in priority_queue %}
+      <a href="{{ item.url }}" class="block rounded-xl border px-4 py-3 hover:bg-bbb-cream {% if item.priority == 'High' %}border-red-200 bg-red-50/50{% else %}border-amber-200 bg-amber-50/40{% endif %}">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="font-semibold text-sm text-bbb-navy">{{ item.title }}</p>
+            <p class="text-xs text-gray-600 mt-1">{{ item.subtitle }}</p>
+          </div>
+          <div class="text-right">
+            <span class="block text-[11px] uppercase tracking-wide {% if item.priority == 'High' %}text-red-700{% else %}text-amber-700{% endif %}">{{ item.priority }}</span>
+            <span class="block text-[11px] text-gray-500 mt-1">{{ item.action_label }}</span>
+          </div>
+        </div>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">Queue is clear. No active priority items right now.</p>
+      {% endfor %}
+    </div>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Concierge Actions</h2>
+    <div class="space-y-3">
+      {% for action in command_center_actions %}
+      <a href="{{ action.url }}" class="block rounded-xl border border-gray-200 px-4 py-3 hover:bg-bbb-cream">
+        <p class="font-semibold text-sm text-bbb-navy">{{ action.title }}</p>
+        <p class="text-xs text-gray-600 mt-1">{{ action.detail }}</p>
+        <p class="text-xs font-semibold text-bbb-teal mt-2">{{ action.cta }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+  <article class="xl:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-serif text-2xl text-bbb-navy">Lead Volume Trend</h2>
+      <span class="text-xs text-gray-500">{{ selected_window_label }}</span>
+    </div>
+    <div class="relative h-72">
+      <canvas id="leadsTrendChart" class="w-full h-full"></canvas>
+    </div>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Reminders</h2>
+    <div class="space-y-3">
+      {% for item in reminders %}
+      <a href="{{ item.url }}" class="block rounded-xl border px-4 py-3 hover:bg-bbb-cream
+        {% if item.level == 'high' %}border-red-200 bg-red-50/60
+        {% elif item.level == 'medium' %}border-amber-200 bg-amber-50/60
+        {% else %}border-blue-200 bg-blue-50/60{% endif %}">
+        <p class="font-semibold text-sm text-bbb-navy">{{ item.title }}</p>
+        <p class="text-xs text-gray-600 mt-1">{{ item.detail }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No urgent reminders right now.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-serif text-2xl text-bbb-navy">Revenue Trend</h2>
+      <span class="text-xs text-gray-500">Paid transactions</span>
+    </div>
+    <div class="relative h-72">
+      <canvas id="revenueTrendChart" class="w-full h-full"></canvas>
+    </div>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Pipeline Distribution</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Bookings by Status</p>
+        <div class="relative h-56">
+          <canvas id="bookingStatusChart" class="w-full h-full"></canvas>
+        </div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Service Requests</p>
+        <div class="relative h-56">
+          <canvas id="serviceTypeChart" class="w-full h-full"></canvas>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 xl:col-span-2">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Upcoming Calendar</h2>
+    <div class="space-y-3 max-h-[24rem] overflow-auto pr-1">
+      {% for event in upcoming_events %}
+      <a href="{{ event.url }}" class="block rounded-xl border border-gray-200 px-4 py-3 hover:bg-bbb-cream">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="font-semibold text-sm text-bbb-navy">{{ event.title }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ event.subtitle }}</p>
+          </div>
+          <p class="text-xs font-semibold text-bbb-teal whitespace-nowrap">{{ event.date.strftime('%b %d, %Y') }}</p>
+        </div>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No upcoming events yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">{{ month_title }}</h2>
+    <div class="grid grid-cols-7 text-center text-[11px] uppercase tracking-wide text-gray-500 mb-2">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="space-y-1">
+      {% for week in calendar_weeks %}
+      <div class="grid grid-cols-7 gap-1">
+        {% for day in week %}
+        <div class="h-11 rounded-md border p-1 text-[11px] text-center
+          {% if day.is_current_month %}border-gray-200 bg-white{% else %}border-transparent bg-gray-50 text-gray-400{% endif %}
+          {% if day.is_today %} ring-1 ring-bbb-teal {% endif %}">
+          <div class="font-semibold">{{ day.day }}</div>
+          {% if day.event_count %}
+          <div class="text-[10px] text-bbb-teal">{{ day.event_count }} evt</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Recent Contacts</h2>
+    <div class="space-y-3">
+      {% for item in recent_contacts %}
+      <a href="{{ url_for('admin.contact_detail', id=item.id) }}" class="block border border-gray-100 rounded-lg p-3 hover:bg-bbb-cream">
+        <p class="font-semibold text-sm">{{ item.name }}</p>
+        <p class="text-xs text-gray-500">{{ item.email }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No contacts yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Recent Bookings</h2>
+    <div class="space-y-3">
+      {% for item in recent_bookings %}
+      <a href="{{ url_for('admin.booking_detail', id=item.id) }}" class="block border border-gray-100 rounded-lg p-3 hover:bg-bbb-cream">
+        <p class="font-semibold text-sm">{{ item.couple_name }}</p>
+        <p class="text-xs text-gray-500">{{ item.email }} • {{ item.status }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No bookings yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Recent Transactions</h2>
+    <div class="space-y-3">
+      {% for item in recent_payments %}
+      <a href="{{ url_for('admin.payments') }}" class="block border border-gray-100 rounded-lg p-3 hover:bg-bbb-cream">
+        <p class="font-semibold text-sm">#{{ item.id }} • ${{ '%.2f'|format(item.amount_dollars) }}</p>
+        <p class="text-xs text-gray-500">{{ item.status }} • {{ item.created_at.strftime('%Y-%m-%d') }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No payments yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Recent Service Requests</h2>
+    <div class="space-y-3">
+      {% for item in recent_service_requests %}
+      <a href="{{ url_for('admin.service_request_detail', id=item.id) }}" class="block border border-gray-100 rounded-lg p-3 hover:bg-bbb-cream">
+        <p class="font-semibold text-sm">{{ item.name }} • {{ item.request_type }}</p>
+        <p class="text-xs text-gray-500">{{ item.email }} • {{ item.status }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No service requests yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const monthLabels = {{ month_labels|tojson }};
+  const leadsSeries = {{ leads_by_month|tojson }};
+  const contactsSeries = {{ contacts_by_month|tojson }};
+  const bookingsSeries = {{ bookings_by_month|tojson }};
+  const servicesSeries = {{ services_by_month|tojson }};
+  const revenueSeries = {{ revenue_by_month_dollars|tojson }};
+  const bookingStatus = {{ booking_status_counts|tojson }};
+  const serviceType = {{ service_type_counts|tojson }};
+
+  const baseGrid = { color: "rgba(156,163,175,0.22)" };
+  const tickColor = "#6B7280";
+
+  new Chart(document.getElementById("leadsTrendChart"), {
+    type: "line",
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: "Total Leads", data: leadsSeries, borderColor: "#88A096", backgroundColor: "rgba(136,160,150,0.15)", fill: true, tension: 0.35 },
+        { label: "Contacts", data: contactsSeries, borderColor: "#C9928B", tension: 0.3 },
+        { label: "Bookings", data: bookingsSeries, borderColor: "#273445", tension: 0.3 },
+        { label: "Service Requests", data: servicesSeries, borderColor: "#B8A48E", tension: 0.3 },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, grid: baseGrid, ticks: { color: tickColor } }, x: { grid: { display: false }, ticks: { color: tickColor } } },
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+
+  new Chart(document.getElementById("revenueTrendChart"), {
+    type: "bar",
+    data: {
+      labels: monthLabels,
+      datasets: [{ label: "Paid Revenue ($)", data: revenueSeries, backgroundColor: "rgba(39,52,69,0.78)", borderRadius: 8 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, grid: baseGrid, ticks: { color: tickColor } }, x: { grid: { display: false }, ticks: { color: tickColor } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  new Chart(document.getElementById("bookingStatusChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["New", "Reviewing", "Confirmed", "Cancelled"],
+      datasets: [{
+        data: [bookingStatus.new, bookingStatus.reviewing, bookingStatus.confirmed, bookingStatus.cancelled],
+        backgroundColor: ["#88A096", "#B8A48E", "#273445", "#C9928B"]
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+  });
+
+  new Chart(document.getElementById("serviceTypeChart"), {
+    type: "polarArea",
+    data: {
+      labels: ["Package", "Venue", "Catering", "Florals"],
+      datasets: [{
+        data: [serviceType.package, serviceType.venue, serviceType.catering, serviceType.florals],
+        backgroundColor: ["rgba(136,160,150,0.8)", "rgba(39,52,69,0.82)", "rgba(184,164,142,0.85)", "rgba(201,146,139,0.82)"]
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+  });
+</script>
+{% endblock %}

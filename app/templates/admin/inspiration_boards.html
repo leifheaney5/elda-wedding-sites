@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Inspiration Boards{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Inspiration Boards</h1>
+</div>
+
+<form method="GET" class="mb-4 max-w-xl">
+  <label for="inspiration-search" class="sr-only">Search inspiration boards</label>
+  <input id="inspiration-search" type="text" name="q" value="{{ q }}" placeholder="Search by client, colors, themes, florals, notes" class="form-input" />
+</form>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Client</th>
+        <th class="px-4 py-3">Colors</th>
+        <th class="px-4 py-3">Themes</th>
+        <th class="px-4 py-3">Florals</th>
+        <th class="px-4 py-3">Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in boards.items %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3">
+          <a class="text-bbb-teal" href="{{ url_for('admin.inspiration_board_detail', id=item.id) }}">
+            {{ item.client.full_name or item.client.email }}
+          </a>
+          <p class="text-xs text-gray-500">{{ item.client.email }}</p>
+        </td>
+        <td class="px-4 py-3">{{ item.colors or '-' }}</td>
+        <td class="px-4 py-3">{{ item.themes or '-' }}</td>
+        <td class="px-4 py-3">{{ item.florals or '-' }}</td>
+        <td class="px-4 py-3">{{ item.updated_at.strftime('%Y-%m-%d %H:%M') if item.updated_at else '-' }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="px-4 py-6 text-gray-500" colspan="5">No inspiration boards yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if boards.pages > 1 %}
+<div class="flex items-center gap-2 mt-4">
+  {% for p in range(1, boards.pages + 1) %}
+  <a class="px-3 py-1 rounded border text-sm {% if p == boards.page %}bg-bbb-navy text-white border-bbb-navy{% else %}bg-white border-gray-300{% endif %}"
+     href="{{ url_for('admin.inspiration_boards', page=p, q=q or None) }}">{{ p }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

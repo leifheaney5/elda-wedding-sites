@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Message Planner{% endblock %}
+{% block content %}
+{% set hero_script_line = "Private Concierge Portal" %}
+{% set hero_title = "Message Your Planner" %}
+{% set hero_subtitle = "Send tagged messages directly to the planning team and keep all conversation history in one place." %}
+{% include 'components/hero.html' %}
+{% include 'components/client_portal_tabs.html' %}
+
+<section class="py-12 bg-gradient-to-b from-bbb-cream via-[#faf8f5] to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
+    <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="font-serif text-2xl text-bbb-navy mb-2">New Message</h2>
+      <p class="text-sm text-gray-600 mb-5">Tag your note so your planner can triage quickly.</p>
+      <form method="POST" action="{{ url_for('client.messages') }}" class="space-y-4" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div>
+          <label for="message_type" class="form-label">Type</label>
+          <select id="message_type" name="message_type" class="form-input">
+            {% for value, label in message_types %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="subject" class="form-label">Subject</label>
+          <input id="subject" name="subject" class="form-input" placeholder="What is this about?" />
+        </div>
+        <div>
+          <label for="message" class="form-label">Message</label>
+          <textarea id="message" name="message" rows="6" class="form-input resize-none" placeholder="Write your message to the planning team..." required></textarea>
+        </div>
+        <div>
+          <label for="attachments" class="form-label">Attachments (optional)</label>
+          <input id="attachments" name="attachments" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx" class="form-input" />
+          <p class="text-xs text-gray-500 mt-1">Accepted: images, PDF, docs, spreadsheets, text (max 8MB each).</p>
+        </div>
+        <button type="submit" class="px-6 py-3 rounded-full bg-bbb-teal text-white font-semibold hover:bg-bbb-teal-dark">
+          Send Message
+        </button>
+      </form>
+    </article>
+
+    <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="font-serif text-2xl text-bbb-navy mb-4">Message History</h2>
+      <div class="space-y-3 max-h-[36rem] overflow-auto pr-1">
+        {% for item in messages %}
+        <div class="border border-bbb-sand rounded-xl p-4">
+          {% set is_admin_reply = item.services_interested and 'portal_message:admin_reply:' in item.services_interested %}
+          <p class="text-[11px] uppercase tracking-wide {% if is_admin_reply %}text-bbb-navy{% else %}text-bbb-teal{% endif %} font-semibold mb-1">
+            {% if is_admin_reply %}Planner Reply{% else %}You{% endif %}
+          </p>
+          <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.subject or "Portal Message" }}</p>
+          <p class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ item.message }}</p>
+          {% if item.attachments %}
+          <div class="mt-3 flex flex-wrap gap-2">
+            {% for att in item.attachments %}
+            <a href="{{ url_for('client.download_message_attachment', attachment_id=att.id) }}"
+               class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream border border-bbb-sand text-bbb-navy">
+              {{ att.filename }} ({{ (att.size_bytes / 1024)|round(1) }} KB)
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <p class="text-xs text-gray-500 mt-2">{{ item.submitted_at.strftime('%Y-%m-%d %H:%M') if item.submitted_at else '' }}</p>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-500">No messages yet.</p>
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

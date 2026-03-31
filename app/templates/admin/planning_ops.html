@@ -1,0 +1,876 @@
+{% extends "admin/base.html" %}
+{% block title %}Planning Ops{% endblock %}
+{% block admin_content %}
+<section class="mb-6">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="font-serif text-4xl text-bbb-navy">Planning Operations</h1>
+      <p class="text-sm text-gray-500">Manage logistics workflow and seating plans with client-level completion tracking.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+  <form method="GET" action="{{ url_for('admin.planning_ops') }}" class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-end">
+    <div>
+      <label for="client_id" class="text-xs uppercase tracking-wide text-gray-500">Client</label>
+      <select id="client_id" name="client_id" class="form-input mt-1" onchange="this.form.submit()">
+        {% for client in clients %}
+        <option value="{{ client.id }}" {% if selected_client and selected_client.id == client.id %}selected{% endif %}>
+          {{ client.full_name or client.email }} — {{ client.email }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="px-5 py-2 rounded-full bg-bbb-teal text-white font-semibold">Load Client</button>
+  </form>
+</section>
+
+{% if selected_client %}
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 xl:col-span-2">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Process Completion</p>
+    <p class="font-serif text-3xl text-bbb-navy mb-3">{{ progress_percent }}%</p>
+    <progress class="w-full h-2.5" value="{{ progress_percent }}" max="100">{{ progress_percent }}%</progress>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Completed</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ completed_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Total Tasks</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ total_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Overdue</p>
+    <p class="font-serif text-3xl {% if overdue_count > 0 %}text-rose-700{% else %}text-bbb-navy{% endif %}">{{ overdue_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Due in 30 Days</p>
+    <p class="font-serif text-3xl {% if due_soon_count > 0 %}text-amber-700{% else %}text-bbb-navy{% endif %}">{{ due_soon_count }}</p>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-[1.35fr_1fr] gap-6 mb-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-serif text-2xl text-bbb-navy">Logistics Planner</h2>
+      {% if active_booking %}
+      <a href="{{ url_for('admin.booking_detail', id=active_booking.id) }}" class="text-xs font-semibold text-bbb-teal">Open Booking</a>
+      {% endif %}
+    </div>
+    <div class="space-y-3 max-h-[38rem] overflow-auto pr-1 mb-5">
+      {% for task in tasks %}
+      {% set is_overdue = (not task.is_completed and task.due_date and task.due_date < now.date()) %}
+      <div class="border rounded-xl p-4 flex items-start justify-between gap-3 {% if is_overdue %}border-rose-200 bg-rose-50/60{% else %}border-bbb-sand{% endif %}">
+        <div>
+          <p class="font-semibold {% if task.is_completed %}line-through text-gray-500{% else %}text-bbb-navy{% endif %}">{{ task.title }}</p>
+          <p class="text-xs text-gray-500">
+            {{ task.category or 'General' }}
+            {% if task.due_date %} • Due {{ task.due_date }}{% endif %}
+            {% if task.is_required %} • Required{% else %} • Optional{% endif %}
+          </p>
+          {% if task.notes %}
+          <p class="text-sm text-gray-700 mt-1">{{ task.notes }}</p>
+          {% endif %}
+        </div>
+        <form method="POST" action="{{ url_for('admin.planning_ops') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="action" value="toggle-logistics-task" />
+          <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+          <input type="hidden" name="task_id" value="{{ task.id }}" />
+          <button type="submit" class="px-3 py-1 rounded-full text-xs font-semibold {% if task.is_completed %}bg-green-100 text-green-700{% else %}bg-bbb-teal text-white{% endif %}">
+            {% if task.is_completed %}Completed{% else %}Mark Done{% endif %}
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-500">No logistics tasks yet for this client.</p>
+      {% endfor %}
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="space-y-3 border-t border-bbb-sand pt-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="add-logistics-task" />
+      <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+      <h3 class="font-serif text-xl text-bbb-navy">Add Logistics Task</h3>
+      <label for="task-title" class="sr-only">Task title</label>
+      <input id="task-title" class="form-input" name="title" placeholder="Task title" required />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="task-category" class="sr-only">Task category</label>
+          <input id="task-category" class="form-input" name="category" placeholder="Category (Logistics, Vendors, Permits...)" />
+        </div>
+        <div>
+          <label for="task-due-date" class="sr-only">Task due date</label>
+          <input id="task-due-date" class="form-input" type="date" name="due_date" />
+        </div>
+      </div>
+      <label for="task-notes" class="sr-only">Task notes</label>
+      <textarea id="task-notes" class="form-input resize-none" name="notes" rows="3" placeholder="Notes"></textarea>
+      <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" name="is_required" value="1" />
+        <span>Required process step</span>
+      </label>
+      <button type="submit" class="px-5 py-2 rounded-full bg-bbb-teal text-white font-semibold">Add Task</button>
+    </form>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Seating Chart</h2>
+
+    <div class="space-y-2 mb-4">
+      {% for plan in seating_plans %}
+      <a href="{{ url_for('admin.planning_ops', client_id=selected_client.id, plan_id=plan.id) }}" class="block border rounded-lg px-3 py-2 text-sm {% if active_plan and plan.id == active_plan.id %}border-bbb-teal bg-bbb-cream{% else %}border-gray-200 hover:bg-bbb-cream{% endif %}">
+        <p class="font-semibold text-bbb-navy">{{ plan.title }}</p>
+        <p class="text-xs text-gray-500">Guest count: {{ plan.final_guest_count }}{% if plan.venue_area %} • {{ plan.venue_area }}{% endif %}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-gray-500">No seating plan yet. Create the first one below.</p>
+      {% endfor %}
+    </div>
+
+    <div class="mb-4 rounded-xl border border-bbb-sand bg-bbb-cream/50 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-bbb-navy">Interactive Seating Designer</p>
+          <p class="text-xs text-gray-600">Drag guests into 8 table rectangles and edit names inline before saving.</p>
+        </div>
+        <button type="button" id="open-seating-designer" class="px-4 py-2 rounded-full bg-bbb-navy text-white text-sm font-semibold">Open Seating Designer</button>
+      </div>
+      {% if seating_source_guest_lines %}
+      <p class="text-xs text-gray-500 mt-3">Client seating list source: {{ seating_source_guest_lines|length }} guest name(s)</p>
+      {% else %}
+      <p class="text-xs text-gray-500 mt-3">No client seating list submitted yet. You can still build the layout manually.</p>
+      {% endif %}
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="space-y-3 border-t border-bbb-sand pt-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="save-seating-plan" />
+      <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+      {% if active_plan %}
+      <input type="hidden" name="plan_id" value="{{ active_plan.id }}" />
+      {% endif %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="seating-title" class="text-xs uppercase tracking-wide text-gray-500">Plan Title</label>
+          <input id="seating-title" class="form-input mt-1" name="title" value="{{ active_plan.title if active_plan else '' }}" placeholder="Main Reception Layout" required />
+        </div>
+        <div>
+          <label for="seating-area" class="text-xs uppercase tracking-wide text-gray-500">Venue Area</label>
+          <input id="seating-area" class="form-input mt-1" name="venue_area" value="{{ active_plan.venue_area if active_plan else '' }}" placeholder="Ballroom, Patio, Garden" />
+        </div>
+      </div>
+
+      <div>
+        <label for="seating-count" class="text-xs uppercase tracking-wide text-gray-500">Final Guest Count</label>
+        <input id="seating-count" class="form-input mt-1" type="number" min="0" name="final_guest_count" value="{{ active_plan.final_guest_count if active_plan else 0 }}" />
+      </div>
+
+      <div>
+        <label for="seating-layout" class="text-xs uppercase tracking-wide text-gray-500">Table Assignments</label>
+        <textarea id="seating-layout" class="form-input resize-none mt-1" name="table_layout" rows="6" placeholder="Table 1: Alex, Sam&#10;Table 2: Jordan, Casey">{{ active_layout_text }}</textarea>
+      </div>
+
+      <div>
+        <label for="seating-rsvp" class="text-xs uppercase tracking-wide text-gray-500">RSVP Status</label>
+        <textarea id="seating-rsvp" class="form-input resize-none mt-1" name="rsvp_status" rows="5" placeholder="Alex: attending&#10;Sam: pending">{{ active_rsvp_text }}</textarea>
+      </div>
+
+      <div>
+        <label for="seating-notes" class="text-xs uppercase tracking-wide text-gray-500">Notes</label>
+        <textarea id="seating-notes" class="form-input resize-none mt-1" name="notes" rows="3" placeholder="VIP table, accessibility requirements, vendor placement">{{ active_plan.notes if active_plan else '' }}</textarea>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button type="submit" class="px-5 py-2 rounded-full bg-bbb-teal text-white font-semibold">Save Seating Plan</button>
+        {% if active_plan %}
+        <a href="{{ url_for('admin.planning_ops', client_id=selected_client.id) }}" class="px-5 py-2 rounded-full border border-bbb-sand text-bbb-navy font-semibold">New Plan</a>
+        {% endif %}
+      </div>
+    </form>
+
+    {% if active_plan %}
+    <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="mt-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="delete-seating-plan" />
+      <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+      <input type="hidden" name="plan_id" value="{{ active_plan.id }}" />
+      <button type="submit" class="px-4 py-2 rounded-full bg-rose-100 text-rose-700 font-semibold">Delete Active Plan</button>
+    </form>
+    {% endif %}
+
+    <section class="mt-5 border-t border-bbb-sand pt-4 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="font-serif text-xl text-bbb-navy">RSVP Operations</h3>
+        <div class="flex flex-wrap gap-2">
+          <form method="POST" action="{{ url_for('admin.planning_ops') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="sync-rsvp-from-seating" />
+            <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+            <button type="submit" class="px-3 py-2 rounded-full border border-bbb-sand text-bbb-navy text-xs font-semibold">Sync from Seating Messages</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.planning_ops') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="send-rsvp-checkin" />
+            <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+            <button type="submit" class="px-3 py-2 rounded-full bg-bbb-navy text-white text-xs font-semibold">Send Client RSVP Check-In</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+        <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Attending</span><strong class="text-bbb-navy">{{ rsvp_values[0] }}</strong></div>
+        <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Pending</span><strong class="text-bbb-navy">{{ rsvp_values[1] }}</strong></div>
+        <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Declined</span><strong class="text-bbb-navy">{{ rsvp_values[2] }}</strong></div>
+        <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Pending >14d</span><strong class="text-bbb-navy">{{ rsvp_pending_long_count }}</strong></div>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 p-3 rounded-xl border border-bbb-sand bg-bbb-cream/30">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="action" value="add-rsvp-guest" />
+        <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+        <input class="form-input" name="full_name" placeholder="Guest full name" required />
+        <input class="form-input" name="email" type="email" placeholder="Email (optional)" />
+        <input class="form-input" name="phone" placeholder="Phone (optional)" />
+        <input class="form-input" name="group_label" placeholder="Group / household" />
+        <button type="submit" class="px-3 py-2 rounded-full bg-bbb-teal text-white text-sm font-semibold">Add RSVP Guest</button>
+      </form>
+
+      <div class="max-h-[16rem] overflow-auto pr-1 space-y-2">
+        {% for guest in rsvp_guests %}
+        <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="border border-bbb-sand rounded-xl p-3 bg-white grid grid-cols-1 xl:grid-cols-[1.2fr_auto_auto_auto_auto] gap-2 items-center">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="action" value="update-rsvp-guest" />
+          <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+          <input type="hidden" name="guest_id" value="{{ guest.id }}" />
+          <div>
+            <p class="font-semibold text-bbb-navy text-sm">{{ guest.full_name }}</p>
+            <p class="text-xs text-gray-500">{{ guest.group_label or 'No group' }}{% if guest.email %} • {{ guest.email }}{% endif %}</p>
+          </div>
+          <select class="form-input text-sm" name="status">
+            {% for key, label in rsvp_status_options %}
+            <option value="{{ key }}" {% if guest.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <input class="form-input text-sm" name="meal_choice" placeholder="Meal" value="{{ guest.meal_choice or '' }}" />
+          <input class="form-input text-sm" name="table_name" placeholder="Table" value="{{ guest.table_name or '' }}" />
+          <div class="flex items-center gap-2">
+            <button type="submit" class="px-3 py-2 rounded-full bg-bbb-navy text-white text-xs font-semibold">Save</button>
+          </div>
+        </form>
+        <form method="POST" action="{{ url_for('admin.planning_ops') }}" class="-mt-1 mb-2 text-right">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="action" value="delete-rsvp-guest" />
+          <input type="hidden" name="client_id" value="{{ selected_client.id }}" />
+          <input type="hidden" name="guest_id" value="{{ guest.id }}" />
+          <button type="submit" class="text-xs text-rose-600 hover:text-rose-700">Remove guest</button>
+        </form>
+        {% else %}
+        <p class="text-sm text-gray-500">No RSVP guests yet. Add guests or sync from seating messages.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div id="seating-designer-modal" class="hidden fixed inset-0 z-50 bg-bbb-navy/80 backdrop-blur-sm p-4 overflow-auto">
+      <div class="max-w-7xl mx-auto bg-gradient-to-b from-white to-bbb-cream rounded-3xl shadow-2xl border-2 border-bbb-gold/40 p-6">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-bbb-sand">
+          <div>
+            <h3 class="font-serif text-3xl text-bbb-navy">Seating Designer</h3>
+            <p class="text-sm text-gray-600">Build and customize your layout, then export as text or image.</p>
+          </div>
+          <button type="button" id="close-seating-designer" class="px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold">Close</button>
+        </div>
+
+        <div class="mb-4 rounded-xl border border-bbb-sand bg-bbb-cream/40 p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 items-end">
+            <div>
+              <label for="seating-table-count" class="text-xs uppercase tracking-wide text-gray-500">Table Count</label>
+              <select id="seating-table-count" class="form-input mt-1">
+                {% for n in range(4, 17) %}
+                <option value="{{ n }}" {% if n == 8 %}selected{% endif %}>{{ n }} tables</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="seating-table-prefix" class="text-xs uppercase tracking-wide text-gray-500">Table Label Prefix</label>
+              <input id="seating-table-prefix" class="form-input mt-1" value="Table" maxlength="30" />
+            </div>
+            <button type="button" id="sort-seating-guests" class="px-4 py-2 rounded-full border border-bbb-sand text-bbb-navy text-sm font-semibold">Sort Guests A-Z</button>
+            <button type="button" id="auto-balance-seating" class="px-4 py-2 rounded-full border border-bbb-sand text-bbb-navy text-sm font-semibold">Auto Balance</button>
+            <button type="button" id="clear-seating-assignments" class="px-4 py-2 rounded-full border border-bbb-sand text-bbb-navy text-sm font-semibold">Clear Assignments</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-[300px_1fr] gap-4">
+          <aside class="border border-bbb-gold/40 rounded-xl p-3 bg-bbb-cream/80 shadow-inner">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-bbb-navy">Guest Pool</p>
+              <button type="button" id="add-seating-guest" class="px-2 py-1 text-xs rounded-full bg-bbb-teal text-white">Add Guest</button>
+            </div>
+            <div id="seating-unassigned" class="min-h-[12rem] max-h-[28rem] overflow-auto space-y-2 border-2 border-dashed border-bbb-sand rounded-lg p-2 bg-white"></div>
+          </aside>
+
+          <section>
+            <div id="seating-table-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3"></div>
+          </section>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button type="button" id="apply-seating-designer" class="px-4 py-2 rounded-full bg-bbb-teal text-white font-semibold">Apply to Plan</button>
+          <button type="button" id="reset-seating-designer" class="px-4 py-2 rounded-full border border-bbb-sand text-bbb-navy font-semibold">Reset from Text</button>
+          <button type="button" id="export-seating-txt" class="px-4 py-2 rounded-full border border-bbb-sand text-bbb-navy font-semibold">Export .txt</button>
+          <button type="button" id="export-seating-png" class="px-4 py-2 rounded-full bg-bbb-navy text-white font-semibold">Export .png</button>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Workflow Status</h2>
+    <div class="relative h-64">
+      <canvas id="planningWorkflowChart" class="w-full h-full"></canvas>
+    </div>
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Task Categories</h2>
+    <div class="relative h-64">
+      <canvas id="planningCategoryChart" class="w-full h-full"></canvas>
+    </div>
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Due Date Distribution</h2>
+    <div class="relative h-64">
+      <canvas id="planningDueChart" class="w-full h-full"></canvas>
+    </div>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">Seating Table Capacity</h2>
+    {% if seating_table_labels %}
+    <div class="relative h-72">
+      <canvas id="seatingTableChart" class="w-full h-full"></canvas>
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-500">No table assignment data in the active plan yet.</p>
+    {% endif %}
+  </article>
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-4">RSVP Mix</h2>
+    {% if rsvp_values|sum > 0 %}
+    <div class="relative h-72">
+      <canvas id="seatingRsvpChart" class="w-full h-full"></canvas>
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-500">No RSVP records in the active plan yet.</p>
+    {% endif %}
+  </article>
+</section>
+{% else %}
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+  <p class="text-gray-600">No client records are available yet. Create or import client accounts first.</p>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block admin_scripts %}
+{% if selected_client %}
+<script id="planning-ops-data" type="application/json">{{ {
+  'workflow_labels': workflow_labels,
+  'workflow_values': workflow_values,
+  'category_labels': category_labels,
+  'category_values': category_values,
+  'due_labels': due_labels,
+  'due_values': due_values,
+  'seating_table_labels': seating_table_labels,
+  'seating_table_values': seating_table_values,
+  'rsvp_labels': rsvp_labels,
+  'rsvp_values': rsvp_values,
+  'seating_source_guest_lines': seating_source_guest_lines,
+  'active_layout_text': active_layout_text
+}|tojson }}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const planningData = JSON.parse(document.getElementById("planning-ops-data").textContent || "{}");
+  const workflowLabels = planningData.workflow_labels || [];
+  const workflowValues = planningData.workflow_values || [];
+  const categoryLabels = planningData.category_labels || [];
+  const categoryValues = planningData.category_values || [];
+  const dueLabels = planningData.due_labels || [];
+  const dueValues = planningData.due_values || [];
+  const seatingTableLabels = planningData.seating_table_labels || [];
+  const seatingTableValues = planningData.seating_table_values || [];
+  const rsvpLabels = planningData.rsvp_labels || [];
+  const rsvpValues = planningData.rsvp_values || [];
+
+  const tickColor = "#6B7280";
+  const baseGrid = { color: "rgba(156,163,175,0.22)" };
+
+  new Chart(document.getElementById("planningWorkflowChart"), {
+    type: "doughnut",
+    data: {
+      labels: workflowLabels,
+      datasets: [{
+        data: workflowValues,
+        backgroundColor: ["#88A096", "#273445", "#C9928B", "#B8A48E"]
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+  });
+
+  new Chart(document.getElementById("planningCategoryChart"), {
+    type: "bar",
+    data: {
+      labels: categoryLabels,
+      datasets: [{
+        label: "Tasks",
+        data: categoryValues,
+        backgroundColor: "rgba(39,52,69,0.78)",
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, grid: baseGrid, ticks: { color: tickColor, precision: 0 } },
+        x: { grid: { display: false }, ticks: { color: tickColor } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  new Chart(document.getElementById("planningDueChart"), {
+    type: "polarArea",
+    data: {
+      labels: dueLabels,
+      datasets: [{
+        data: dueValues,
+        backgroundColor: [
+          "rgba(201,146,139,0.82)",
+          "rgba(184,164,142,0.85)",
+          "rgba(136,160,150,0.82)",
+          "rgba(39,52,69,0.72)",
+          "rgba(156,163,175,0.62)"
+        ]
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+  });
+
+  if (seatingTableLabels.length > 0) {
+    new Chart(document.getElementById("seatingTableChart"), {
+      type: "bar",
+      data: {
+        labels: seatingTableLabels,
+        datasets: [{
+          label: "Guests",
+          data: seatingTableValues,
+          backgroundColor: "rgba(136,160,150,0.82)",
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, grid: baseGrid, ticks: { color: tickColor, precision: 0 } },
+          x: { grid: { display: false }, ticks: { color: tickColor } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  if (rsvpValues.some(v => v > 0)) {
+    new Chart(document.getElementById("seatingRsvpChart"), {
+      type: "pie",
+      data: {
+        labels: rsvpLabels,
+        datasets: [{
+          data: rsvpValues,
+          backgroundColor: ["#88A096", "#B8A48E", "#C9928B", "#273445"]
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+    });
+  }
+
+  const modalEl = document.getElementById("seating-designer-modal");
+  const openBtn = document.getElementById("open-seating-designer");
+  const closeBtn = document.getElementById("close-seating-designer");
+  const resetBtn = document.getElementById("reset-seating-designer");
+  const applyBtn = document.getElementById("apply-seating-designer");
+  const addGuestBtn = document.getElementById("add-seating-guest");
+  const exportTxtBtn = document.getElementById("export-seating-txt");
+  const exportPngBtn = document.getElementById("export-seating-png");
+  const tableCountSelect = document.getElementById("seating-table-count");
+  const tablePrefixInput = document.getElementById("seating-table-prefix");
+  const sortGuestsBtn = document.getElementById("sort-seating-guests");
+  const autoBalanceBtn = document.getElementById("auto-balance-seating");
+  const clearAssignmentsBtn = document.getElementById("clear-seating-assignments");
+  const unassignedEl = document.getElementById("seating-unassigned");
+  const tableGridEl = document.getElementById("seating-table-grid");
+  const seatingLayoutTextarea = document.getElementById("seating-layout");
+  const seatingGuestCountInput = document.getElementById("seating-count");
+
+  if (modalEl && openBtn && closeBtn && applyBtn && unassignedEl && tableGridEl && seatingLayoutTextarea) {
+    let tableCount = Number(tableCountSelect?.value || 8);
+    let tablePrefix = (tablePrefixInput?.value || "Table").trim() || "Table";
+    let guests = [];
+    let dragGuestId = null;
+
+    const getTableNames = () => Array.from({ length: tableCount }, (_, idx) => `${tablePrefix} ${idx + 1}`);
+
+    const dateStamp = () => {
+      const now = new Date();
+      const pad = (value) => String(value).padStart(2, "0");
+      return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+    };
+
+    const triggerDownload = (filename, href) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
+
+    const parseGuestNamesFromText = (text) => {
+      const out = [];
+      (text || "").split("\n").forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        const payload = trimmed.includes(":") ? trimmed.split(":").slice(1).join(":").trim() : trimmed;
+        payload.split(",").map((part) => part.trim()).filter(Boolean).forEach((name) => out.push(name));
+      });
+      return out;
+    };
+
+    const hydrateGuestsFromSource = () => {
+      const tableMap = {};
+      (seatingLayoutTextarea.value || "").split("\n").forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.includes(":")) return;
+        const [tableNameRaw, namesRaw] = trimmed.split(":", 2);
+        tableMap[tableNameRaw.trim()] = namesRaw.split(",").map((n) => n.trim()).filter(Boolean);
+      });
+
+      const seeded = [];
+      const seen = new Set();
+      const tableNames = getTableNames();
+      tableNames.forEach((tableName) => {
+        (tableMap[tableName] || []).forEach((name) => {
+          const key = name.toLowerCase();
+          if (seen.has(key)) return;
+          seen.add(key);
+          seeded.push({ id: `g-${Math.random().toString(36).slice(2)}`, name, table: tableName });
+        });
+      });
+
+      const sourceNames = planningData.seating_source_guest_lines || [];
+      const fallbackNames = parseGuestNamesFromText(planningData.active_layout_text || "");
+      [...sourceNames, ...fallbackNames].forEach((name) => {
+        const key = String(name).toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        seeded.push({ id: `g-${Math.random().toString(36).slice(2)}`, name: String(name), table: null });
+      });
+
+      guests = seeded;
+    };
+
+    const draggableGuestCard = (guest) => {
+      const wrap = document.createElement("div");
+      wrap.className = "rounded-lg border border-bbb-sand bg-white px-2 py-2 shadow-sm";
+      wrap.draggable = true;
+      wrap.dataset.guestId = guest.id;
+      wrap.addEventListener("dragstart", (event) => {
+        dragGuestId = guest.id;
+        event.dataTransfer.effectAllowed = "move";
+        wrap.classList.add("opacity-60", "ring-2", "ring-bbb-teal");
+      });
+      wrap.addEventListener("dragend", () => {
+        wrap.classList.remove("opacity-60", "ring-2", "ring-bbb-teal");
+      });
+
+      const input = document.createElement("input");
+      input.className = "w-full text-sm text-bbb-navy bg-transparent outline-none";
+      input.value = guest.name;
+      input.addEventListener("input", (event) => {
+        const targetGuest = guests.find((item) => item.id === guest.id);
+        if (targetGuest) targetGuest.name = event.target.value;
+      });
+
+      wrap.appendChild(input);
+      return wrap;
+    };
+
+    const buildDropZone = (title) => {
+      const zone = document.createElement("div");
+      zone.className = "rounded-xl border-2 border-bbb-sand bg-white/80 p-2 min-h-[8rem] transition-colors";
+      zone.dataset.tableName = title;
+
+      const label = document.createElement("p");
+      label.className = "text-xs font-semibold text-bbb-navy mb-2";
+      const occupantCount = guests.filter((item) => item.table === title).length;
+      label.textContent = `${title} (${occupantCount})`;
+      zone.appendChild(label);
+
+      const list = document.createElement("div");
+      list.className = "space-y-2 min-h-[5rem]";
+      zone.appendChild(list);
+
+      zone.addEventListener("dragover", (event) => event.preventDefault());
+      zone.addEventListener("dragenter", () => {
+        zone.classList.add("border-bbb-teal", "bg-bbb-cream/70");
+      });
+      zone.addEventListener("dragleave", () => {
+        zone.classList.remove("border-bbb-teal", "bg-bbb-cream/70");
+      });
+      zone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        zone.classList.remove("border-bbb-teal", "bg-bbb-cream/70");
+        if (!dragGuestId) return;
+        const targetGuest = guests.find((item) => item.id === dragGuestId);
+        if (!targetGuest) return;
+        targetGuest.table = title === "Unassigned" ? null : title;
+        renderDesigner();
+      });
+
+      return { zone, list };
+    };
+
+    const renderDesigner = () => {
+      unassignedEl.innerHTML = "";
+      tableGridEl.innerHTML = "";
+
+      guests.filter((item) => !item.table).forEach((guest) => {
+        unassignedEl.appendChild(draggableGuestCard(guest));
+      });
+
+      const tableNames = getTableNames();
+      tableNames.forEach((tableName) => {
+        const { zone, list } = buildDropZone(tableName);
+        guests.filter((item) => item.table === tableName).forEach((guest) => {
+          list.appendChild(draggableGuestCard(guest));
+        });
+        tableGridEl.appendChild(zone);
+      });
+    };
+
+    unassignedEl.addEventListener("dragover", (event) => event.preventDefault());
+    unassignedEl.addEventListener("dragenter", () => {
+      unassignedEl.classList.add("border-bbb-teal", "bg-bbb-cream/40");
+    });
+    unassignedEl.addEventListener("dragleave", () => {
+      unassignedEl.classList.remove("border-bbb-teal", "bg-bbb-cream/40");
+    });
+    unassignedEl.addEventListener("drop", (event) => {
+      event.preventDefault();
+      unassignedEl.classList.remove("border-bbb-teal", "bg-bbb-cream/40");
+      if (!dragGuestId) return;
+      const targetGuest = guests.find((item) => item.id === dragGuestId);
+      if (!targetGuest) return;
+      targetGuest.table = null;
+      renderDesigner();
+    });
+
+    const buildLayoutRows = () => {
+      const rows = [];
+      const tableNames = getTableNames();
+      tableNames.forEach((tableName) => {
+        const names = guests
+          .filter((item) => item.table === tableName)
+          .map((item) => item.name.trim())
+          .filter(Boolean);
+        if (names.length) rows.push(`${tableName}: ${names.join(", ")}`);
+      });
+      return rows;
+    };
+
+    const applyDesignerToForm = () => {
+      const rows = buildLayoutRows();
+      seatingLayoutTextarea.value = rows.join("\n");
+      if (seatingGuestCountInput) {
+        const totalAssigned = guests.filter((item) => item.table && item.name.trim()).length;
+        seatingGuestCountInput.value = String(totalAssigned);
+      }
+    };
+
+    const exportLayoutAsTxt = () => {
+      const rows = buildLayoutRows();
+      const unassigned = guests
+        .filter((item) => !item.table)
+        .map((item) => item.name.trim())
+        .filter(Boolean);
+      const body = [
+        "ELDA Wedding Sites - Seating Layout Export",
+        `Generated: ${new Date().toLocaleString()}`,
+        "",
+        ...rows,
+        "",
+        `Unassigned: ${unassigned.join(", ") || "None"}`,
+      ].join("\n");
+      const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      triggerDownload(`seating-layout-${dateStamp()}.txt`, url);
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    };
+
+    const exportLayoutAsPng = () => {
+      const tableNames = getTableNames();
+      const columns = tableNames.length <= 8 ? 4 : 5;
+      const cellWidth = 330;
+      const cellHeight = 220;
+      const gutter = 20;
+      const rows = Math.ceil(tableNames.length / columns);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = columns * cellWidth + (columns + 1) * gutter;
+      canvas.height = rows * cellHeight + (rows + 1) * gutter + 120;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.fillStyle = "#FAF6F1";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#1A2E44";
+      ctx.font = "bold 28px Arial";
+      ctx.fillText("Seating Layout", gutter, 44);
+      ctx.font = "16px Arial";
+      ctx.fillText(`Generated ${new Date().toLocaleString()}`, gutter, 72);
+
+      const drawRoundedRect = (x, y, width, height, radius) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      };
+
+      tableNames.forEach((tableName, index) => {
+        const col = index % columns;
+        const row = Math.floor(index / columns);
+        const x = gutter + col * (cellWidth + gutter);
+        const y = 100 + gutter + row * (cellHeight + gutter);
+        const assigned = guests
+          .filter((item) => item.table === tableName)
+          .map((item) => item.name.trim())
+          .filter(Boolean);
+
+        drawRoundedRect(x, y, cellWidth, cellHeight, 14);
+        ctx.fillStyle = "#F5EFE6";
+        ctx.fill();
+        ctx.strokeStyle = "#4A9B8E";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#1A2E44";
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(`${tableName} (${assigned.length})`, x + 12, y + 28);
+
+        ctx.font = "14px Arial";
+        const maxLines = 11;
+        assigned.slice(0, maxLines).forEach((guestName, lineIdx) => {
+          ctx.fillText(`• ${guestName}`, x + 12, y + 52 + lineIdx * 14);
+        });
+        if (assigned.length > maxLines) {
+          ctx.fillText(`... +${assigned.length - maxLines} more`, x + 12, y + 52 + maxLines * 14);
+        }
+      });
+
+      const unassigned = guests
+        .filter((item) => !item.table)
+        .map((item) => item.name.trim())
+        .filter(Boolean);
+      if (unassigned.length) {
+        ctx.fillStyle = "#1A2E44";
+        ctx.font = "bold 15px Arial";
+        ctx.fillText(`Unassigned: ${unassigned.join(", ")}`, gutter, canvas.height - 18);
+      }
+
+      triggerDownload(`seating-layout-${dateStamp()}.png`, canvas.toDataURL("image/png"));
+    };
+
+    openBtn.addEventListener("click", () => {
+      hydrateGuestsFromSource();
+      renderDesigner();
+      modalEl.classList.remove("hidden");
+    });
+    closeBtn.addEventListener("click", () => modalEl.classList.add("hidden"));
+    resetBtn?.addEventListener("click", () => {
+      hydrateGuestsFromSource();
+      renderDesigner();
+    });
+    addGuestBtn?.addEventListener("click", () => {
+      guests.push({ id: `g-${Math.random().toString(36).slice(2)}`, name: "New Guest", table: null });
+      renderDesigner();
+    });
+    tableCountSelect?.addEventListener("change", () => {
+      tableCount = Math.max(4, Math.min(16, Number(tableCountSelect.value || 8)));
+      const allowed = new Set(getTableNames());
+      guests.forEach((guest) => {
+        if (guest.table && !allowed.has(guest.table)) {
+          guest.table = null;
+        }
+      });
+      renderDesigner();
+    });
+    tablePrefixInput?.addEventListener("change", () => {
+      const prevNames = getTableNames();
+      tablePrefix = (tablePrefixInput.value || "").trim() || "Table";
+      const nextNames = getTableNames();
+      const remap = new Map(prevNames.map((name, index) => [name, nextNames[index]]));
+      guests.forEach((guest) => {
+        if (guest.table && remap.has(guest.table)) {
+          guest.table = remap.get(guest.table);
+        }
+      });
+      renderDesigner();
+    });
+    sortGuestsBtn?.addEventListener("click", () => {
+      guests.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      renderDesigner();
+    });
+    autoBalanceBtn?.addEventListener("click", () => {
+      const tableNames = getTableNames();
+      const namedGuests = guests.filter((item) => item.name.trim());
+      namedGuests.sort((a, b) => a.name.localeCompare(b.name));
+      namedGuests.forEach((guest, idx) => {
+        guest.table = tableNames[idx % tableNames.length];
+      });
+      renderDesigner();
+    });
+    clearAssignmentsBtn?.addEventListener("click", () => {
+      guests.forEach((guest) => { guest.table = null; });
+      renderDesigner();
+    });
+    exportTxtBtn?.addEventListener("click", () => exportLayoutAsTxt());
+    exportPngBtn?.addEventListener("click", () => exportLayoutAsPng());
+    applyBtn.addEventListener("click", () => {
+      applyDesignerToForm();
+      modalEl.classList.add("hidden");
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !modalEl.classList.contains("hidden")) {
+        modalEl.classList.add("hidden");
+      }
+    });
+  }
+</script>
+{% endif %}
+{% endblock %}

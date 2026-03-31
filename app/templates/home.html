@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}ELDA Wedding Sites{% endblock %}
+{% block meta_desc %}General wedding packages, venue options, florals, and catering from ELDA Wedding Sites. Full-service planning for stress-free celebrations.{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+{% set hero_script_line = "Boutique Wedding Planning Team" %}
+{% set hero_title = "ELDA Wedding Sites<br/><span class='text-bbb-gold'>Weddings &amp; Venue</span>" %}
+{% set hero_subtitle = "With 25 years in the industry, we coordinate your ceremony, florals, venue, and vendor details into one seamless experience." %}
+{% set hero_cta_label = "Explore Packages" %}
+{% set hero_cta_url = url_for('packages.index') %}
+{% set hero_cta2_label = "Book Your Date" %}
+{% set hero_cta2_url = url_for('booking.book') %}
+{% set hero_bg = url_for('static', filename='images/hero/home-hero.jpg') %}
+{% set hero_lcp = true %}
+{% include 'components/hero.html' %}
+
+<section class="py-6 bg-white border-b border-bbb-sand">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-3">
+    <a href="{{ url_for('client.login') }}" class="px-6 py-3 bg-bbb-navy text-white rounded-full font-semibold hover:bg-bbb-teal transition-colors">
+      Client Login
+    </a>
+  </div>
+</section>
+
+<!-- Why ELDA Section -->
+<section class="py-20 bg-bbb-cream" style="content-visibility: auto; contain-intrinsic-size: 920px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <p class="font-script text-3xl text-bbb-teal mb-2">Why Choose Us</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Everything You Need for Your Perfect Day</h2>
+      <div class="mt-4 w-16 h-0.5 bg-bbb-gold mx-auto"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {% set features = [
+        ("01", "Ceremony Planning", "Ceremony logistics and legal filing support handled by our team."),
+        ("02", "Decor & Florals", "Soft neutral styling, florals, and details matched to your exact look and budget."),
+        ("03", "Venue Option A", "Indoor reception and intimate dinner options at 123 Example Avenue, Suite 100."),
+        ("04", "Efficient Planning", "Most full-service weddings average 420 planning hours. Our workflow targets 10 to 15."),
+      ] %}
+      {% for icon, title, desc in features %}
+      <div class="text-center p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+        <span class="text-3xl mb-4 block font-serif text-bbb-gold">{{ icon }}</span>
+        <h3 class="font-serif text-xl font-semibold text-bbb-navy mb-2">{{ title }}</h3>
+        <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Packages Preview -->
+<section class="py-20 bg-bbb-sand" style="content-visibility: auto; contain-intrinsic-size: 940px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <p class="font-script text-3xl text-bbb-teal mb-2">Find Your Perfect Fit</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Ceremony Packages</h2>
+      <div class="mt-4 w-16 h-0.5 bg-bbb-gold mx-auto"></div>
+    </div>
+    <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible">
+      {% set packages = [
+        ("Ceremony Package A", "Template package description for a private ceremony format.", url_for('packages.elopement'), "images/packages/package-a.jpg"),
+        ("Ceremony Package B", "Template package description for a small guest ceremony format.", url_for('packages.circle_of_love'), "images/packages/package-b.jpg"),
+        ("Ceremony Package C", "Template package description for full-service ceremony coordination.", url_for('packages.ocean_city'), "images/packages/package-c.jpg"),
+      ] %}
+      {% for name, desc, link, image in packages %}
+      <a href="{{ link }}" class="group block min-w-[84vw] snap-start bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 sm:min-w-[20rem] lg:min-w-0">
+        <div class="h-48 overflow-hidden">
+          <img src="{{ url_for('static', filename=image) }}" alt="{{ name }}" loading="lazy" decoding="async" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        </div>
+        <div class="p-5">
+          <h3 class="font-serif text-lg font-semibold text-bbb-navy mb-2 group-hover:text-bbb-teal transition-colors">{{ name }}</h3>
+          <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ desc }}</p>
+          <span class="mt-3 inline-flex items-center gap-1 text-bbb-teal text-sm font-medium">
+            Learn more
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-10">
+      <a href="{{ url_for('packages.index') }}" class="px-8 py-3 border-2 border-bbb-teal text-bbb-teal hover:bg-bbb-teal hover:text-white font-semibold rounded-full transition-all">
+        View All Packages
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white" style="content-visibility: auto; contain-intrinsic-size: 860px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <p class="font-script text-3xl text-bbb-teal mb-2">More to Explore</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Additional Services</h2>
+    </div>
+    <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible">
+      {% set extras = [
+        ("Complete Planning Guide", url_for('main.planning_guide')),
+        ("Vow Renewals", url_for('main.vow_renewals')),
+        ("Venue Option Request", url_for('booking.service_request', request_type='venue') + '?service=venue-option-a'),
+        ("Template Package Catalog", url_for('packages.index'))
+      ] %}
+      {% for title, link in extras %}
+      <a href="{{ link }}" class="min-w-[80vw] snap-start bg-bbb-cream rounded-2xl p-5 text-center hover:shadow-sm transition-shadow sm:min-w-[18rem] lg:min-w-0">
+        <p class="font-serif text-xl text-bbb-navy">{{ title }}</p>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="mt-8 text-center">
+      <a href="{{ url_for('main.nearby_attractions') }}" class="px-8 py-3 border-2 border-bbb-teal text-bbb-teal hover:bg-bbb-teal hover:text-white font-semibold rounded-full transition-all">
+        Explore Nearby Attractions
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Portal Workflow -->
+<section class="py-20 bg-white" style="content-visibility: auto; contain-intrinsic-size: 860px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <div>
+        <p class="font-script text-3xl text-bbb-teal mb-2">Planning Portal Direction</p>
+        <h2 class="font-serif text-4xl font-bold text-bbb-navy mb-4">Built Around Client Clarity</h2>
+        <div class="w-16 h-0.5 bg-bbb-gold mb-6"></div>
+        <p class="font-sans text-gray-600 leading-relaxed mb-6">
+          We are actively structuring a cleaner planning portal workflow inspired by our internal process notes:
+          one place for scheduling, communications, task tracking, documents, and invoicing.
+        </p>
+        <a href="{{ url_for('contact.contact') }}" class="px-8 py-3 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors inline-block">
+          Ask About Portal Access
+        </a>
+      </div>
+      <div class="bg-bbb-cream rounded-3xl p-8 shadow-sm">
+        <h3 class="font-serif text-2xl font-semibold text-bbb-navy mb-5">Planned Experience</h3>
+        <ul class="space-y-3">
+          {% set portal_features = [
+            "Client dashboard with tasks, calendar, and timelines",
+            "Automated inquiry to proposal to invoice workflow",
+            "Vendor coordination with role-based communication visibility",
+            "Admin reporting focused on wedding-level profitability"
+          ] %}
+          {% for item in portal_features %}
+          <li class="flex items-start gap-3 text-sm text-gray-600">
+            <span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span>
+            <span>{{ item }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Venue Preview -->
+<section class="py-20 bg-bbb-cream" style="content-visibility: auto; contain-intrinsic-size: 760px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <p class="font-script text-3xl text-bbb-teal mb-2">Our Venue</p>
+        <h2 class="font-serif text-4xl font-bold text-bbb-navy mb-4">Venue Option A</h2>
+        <div class="w-16 h-0.5 bg-bbb-gold mb-6"></div>
+        <p class="font-sans text-gray-600 leading-relaxed mb-6">
+          An intimate, beautifully appointed venue suitable for receptions, private dinners, and
+          receptions, intimate dinners, and celebrations with the people who matter most.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="{{ url_for('venue.coastal_59') }}" class="px-6 py-3 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors text-center">
+            Explore the Venue
+          </a>
+          <a href="{{ url_for('venue.gallery') }}" class="px-6 py-3 border-2 border-bbb-teal text-bbb-teal hover:bg-bbb-teal hover:text-white font-semibold rounded-full transition-all text-center">
+            View Gallery
+          </a>
+        </div>
+      </div>
+      <div class="rounded-3xl overflow-hidden shadow-xl h-80">
+        <img src="{{ url_for('static', filename='images/venue/coastal59-room.jpg') }}" alt="Template venue interior" loading="lazy" decoding="async" class="h-full w-full object-cover" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+{% set cta_script = "Your love story starts here" %}
+{% set cta_heading = "Ready to Start Planning Your Dream Wedding?" %}
+{% set cta_sub = "Tell us your wedding vision and preferred date. We will guide the full process from first call to aisle setup." %}
+{% set cta_label = "Book Your Wedding" %}
+{% set cta_url = url_for('booking.book') %}
+{% include 'components/cta_banner.html' %}
+
+{% endblock %}

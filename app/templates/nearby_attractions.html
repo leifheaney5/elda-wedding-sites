@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Nearby Attractions{% endblock %}
+{% block content %}
+{% set hero_script_line = "Guest Experience" %}
+{% set hero_title = "Nearby Attractions" %}
+{% set hero_subtitle = "Help your guests enjoy wedding weekend with curated local recommendations." %}
+{% set hero_bg = url_for('static', filename='images/venue/reception.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% set places = [
+        ("Downtown Arts District", "Local galleries, coffee shops, and evening events.", "https://maps.google.com/?q=Downtown+Arts+District"),
+        ("City Park", "Walking trails, open lawns, and family-friendly space.", "https://maps.google.com/?q=City+Park"),
+        ("Family Entertainment Center", "Group activities and all-ages attractions.", "https://maps.google.com/?q=Family+Entertainment+Center"),
+        ("Regional Nature Preserve", "Scenic trails and outdoor views.", "https://maps.google.com/?q=Regional+Nature+Preserve"),
+        ("Signature Dining District", "Popular restaurants for rehearsal and post-wedding meals.", "https://maps.google.com/?q=Signature+Dining+District"),
+        ("Live Music Venue", "Nightlife and live performances for guests.", "https://maps.google.com/?q=Live+Music+Venue")
+      ] %}
+      {% for name, desc, link in places %}
+      <article class="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 class="font-serif text-2xl text-bbb-navy mb-2">{{ name }}</h2>
+        <p class="text-sm text-gray-600 mb-4">{{ desc }}</p>
+        <a href="{{ link }}" target="_blank" rel="noopener" class="text-bbb-teal font-semibold">Open in Google Maps</a>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="mt-8 bg-white rounded-2xl p-4 shadow-sm">
+      <iframe
+        title="Nearby Attractions Map"
+        src="https://www.google.com/maps?q=123+Example+Avenue+Suite+100,+Example+City,+ST+00000&z=13&output=embed"
+        class="w-full h-80 rounded-xl border border-bbb-sand"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

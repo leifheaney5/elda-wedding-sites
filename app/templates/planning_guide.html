@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Complete Planning Guide{% endblock %}
+{% block meta_desc %}Use this wedding planning guide with checklists, step-by-step milestones, legal timing, weather backup planning, and day-of timeline prep.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Planning Essentials" %}
+{% set hero_title = "The Complete Wedding Planning Guide" %}
+{% set hero_subtitle = "Everything you need to plan a beautiful, stress-free wedding — packages, pricing, venues, permits, florals, planners, coordinators, vendors, and timelines." %}
+{% set hero_bg = url_for('static', filename='images/hero/home-hero.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-4">Step-by-Step Wedding Planning Roadmap</h2>
+      <p class="text-sm text-gray-700 mb-5">
+        This guide consolidates the key planning details couples most often need: timeline, permits, rules, weather prep, menus, florals, and final wedding-week execution.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+        {% set phases = [
+          ("Phase 1", "Set date range, choose package, secure venue/ceremony scope"),
+          ("Phase 2", "Build guest list, menu direction, and floral style"),
+          ("Phase 3", "Finalize permits, legal license, timeline, and vendor confirmations"),
+          ("Phase 4", "Wedding-week checklist, backup weather flow, and day-of execution"),
+        ] %}
+        {% for phase, desc in phases %}
+        <div class="rounded-xl border border-bbb-sand p-4 bg-bbb-cream">
+          <p class="font-semibold text-bbb-navy">{{ phase }}</p>
+          <p class="text-gray-600">{{ desc }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
+      <article class="bg-white rounded-3xl p-8 shadow-sm">
+        <h3 class="font-serif text-2xl text-bbb-navy mb-4">Planning Checklist</h3>
+        <p class="text-sm text-gray-600 mb-4">Tick items as you complete them. Progress is saved in your browser.</p>
+        <div class="space-y-3 text-sm" id="planning-checklist">
+          {% set checklist = [
+            "Choose your ceremony package and preferred date window",
+            "Confirm ceremony location and guest count target",
+            "Select floral direction (bouquets, arch, centerpieces)",
+            "Choose catering menu style and dietary requirements",
+            "Review venue permit requirements and submission timing",
+            "Apply for marriage license and verify waiting period timing",
+            "Set ceremony time (sunset recommendation if desired)",
+            "Create backup weather plan (indoor/covered alternative)",
+            "Confirm music/noise compliance for your location",
+            "Review alcohol service requirements and venue rules",
+            "Finalize day-of timeline with all vendors",
+            "Confirm final payment and communication contacts",
+          ] %}
+          {% for item in checklist %}
+          <label class="flex items-start gap-3 rounded-xl border border-bbb-sand p-3">
+            <input type="checkbox" class="mt-1 planning-check" data-id="plan-{{ loop.index }}" />
+            <span>{{ item }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="bg-white rounded-3xl p-8 shadow-sm">
+        <h3 class="font-serif text-2xl text-bbb-navy mb-4">Critical Rules and Timing</h3>
+        <ul class="space-y-3 text-sm text-gray-700">
+          <li>• Most requested ceremony window is 1-2 hours before sunset for lighting and temperatures.</li>
+          <li>• Worcester County marriage license has a waiting period and validity window; apply early enough to avoid timeline risk.</li>
+          <li>• Outdoor events should always include an inclement weather backup flow.</li>
+          <li>• Music/noise and alcohol permissions vary by location and must be confirmed in advance.</li>
+          <li>• Final balances are typically targeted 30 days before wedding day.</li>
+        </ul>
+        <div class="pt-6 flex flex-wrap gap-3">
+          <a href="{{ url_for('booking.book') }}" class="px-6 py-3 bg-bbb-teal text-white rounded-full font-semibold">Check Your Date</a>
+          <a href="{{ url_for('contact.contact') }}" class="px-6 py-3 border-2 border-bbb-teal text-bbb-teal rounded-full font-semibold">Ask a Planner</a>
+        </div>
+      </article>
+    </div>
+
+    <article class="bg-white rounded-3xl p-8 shadow-sm">
+      <h3 class="font-serif text-2xl text-bbb-navy mb-4">Detailed Topic Index</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+        {% set topics = [
+          "Wedding cost factors and package tiers",
+          "Best ceremony location and guest capacity considerations",
+          "Wedding arches, floral styles, and centerpiece options",
+          "Best wedding months and weather trends",
+          "Permits, legal requirements, and planning windows",
+          "Noise/music and alcohol rule planning",
+          "Sample wedding day timeline from prep to reception",
+          "Why couples choose full-service coordination",
+        ] %}
+        {% for topic in topics %}
+        <div class="rounded-xl border border-bbb-sand p-3 bg-bbb-cream text-gray-700">{{ topic }}</div>
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.planning-check').forEach(function (box) {
+    var key = 'bbb-' + box.dataset.id;
+    if (localStorage.getItem(key) === '1') {
+      box.checked = true;
+    }
+    box.addEventListener('change', function () {
+      localStorage.setItem(key, box.checked ? '1' : '0');
+    });
+  });
+</script>
+{% endblock %}

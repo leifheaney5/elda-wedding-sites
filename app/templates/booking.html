@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Book Your Wedding{% endblock %}
+{% block content %}
+{% set hero_script_line = "Reserve Your Date" %}
+{% set hero_title = "Book Your Wedding" %}
+{% set hero_subtitle = "Submit your requested date and package details. We will follow up with next steps and availability." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-6 shadow-sm mb-6">
+      <h2 class="font-serif text-2xl text-bbb-navy mb-3">Need a Specific Request Form?</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+        <a class="px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream" href="{{ url_for('booking.service_request', request_type='package') }}">Package Request</a>
+        <a class="px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream" href="{{ url_for('booking.service_request', request_type='venue') }}">Venue Request</a>
+        <a class="px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream" href="{{ url_for('booking.service_request', request_type='catering') }}">Catering Request</a>
+        <a class="px-4 py-3 rounded-xl border border-bbb-sand hover:bg-bbb-cream" href="{{ url_for('booking.service_request', request_type='florals') }}">Floral Request</a>
+      </div>
+    </div>
+    <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">Booking Request Form</h2>
+      <p class="text-sm text-gray-500 mb-8">Complete the details below and we will contact you to confirm availability.</p>
+      <form method="POST" action="{{ url_for('booking.book') }}" class="space-y-5">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="couple_name">Couple Name <span class="text-bbb-coral">*</span></label>
+            <input class="form-input" type="text" id="couple_name" name="couple_name" value="{{ form_data.couple_name if form_data else '' }}" required />
+          </div>
+          <div>
+            <label class="form-label" for="email">Email <span class="text-bbb-coral">*</span></label>
+            <input class="form-input" type="email" id="email" name="email" value="{{ form_data.email if form_data else '' }}" required />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="phone">Phone</label>
+            <input class="form-input" type="tel" id="phone" name="phone" value="{{ form_data.phone if form_data else '' }}" />
+          </div>
+          <div>
+            <label class="form-label" for="wedding_date">Requested Date</label>
+            <input class="form-input" type="date" id="wedding_date" name="wedding_date" value="{{ form_data.wedding_date if form_data else '' }}" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="package_id">Package</label>
+            <select class="form-input" id="package_id" name="package_id">
+              <option value="">Select a package</option>
+              {% for value, label in package_choices %}
+              <option value="{{ value }}" {% if selected_package == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="guest_count">Estimated Guest Count</label>
+            <input class="form-input" type="number" id="guest_count" name="guest_count" min="0" value="{{ form_data.guest_count if form_data else '' }}" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="ceremony_time">Preferred Ceremony Time</label>
+            <input class="form-input" type="text" id="ceremony_time" name="ceremony_time" placeholder="Example: 5:00 PM" value="{{ form_data.ceremony_time if form_data else '' }}" />
+          </div>
+          <div>
+            <label class="form-label" for="venue_preference">Venue Preference</label>
+            <input class="form-input" type="text" id="venue_preference" name="venue_preference" placeholder="Venue Option A / Venue Option B / Not sure yet" value="{{ form_data.venue_preference if form_data else '' }}" />
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="special_requests">Special Requests</label>
+          <textarea class="form-input resize-none" id="special_requests" name="special_requests" rows="4" placeholder="Tell us about decor, florals, logistics, or any custom details.">{{ form_data.special_requests if form_data else '' }}</textarea>
+        </div>
+        <button type="submit" class="w-full sm:w-auto px-10 py-3.5 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors shadow-md">
+          Submit Booking Request
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% endblock %}

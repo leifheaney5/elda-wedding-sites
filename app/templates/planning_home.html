@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block title %}Planning{% endblock %}
+{% block meta_desc %}Use the ELDA Wedding Sites planning hub for checklists, FAQs, booking tools, and support resources to plan your wedding.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Planning Hub" %}
+{% set hero_title = "Plan Your Wedding With Clarity" %}
+{% set hero_subtitle = "One place for your checklist, FAQs, booking forms, and direct planning support." %}
+{% set hero_bg = url_for('static', filename='images/gallery/elopement-oceanside.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {% set links = [
+        ("Complete Planning Guide", "Step-by-step planning with checklists and key rules.", url_for('main.planning_guide')),
+        ("FAQ", "Fast answers on timelines, permits, payments, and logistics.", url_for('about.faq')),
+        ("Book Your Wedding", "Submit package and date details to start planning.", url_for('booking.book')),
+        ("Contact a Planner", "Ask a direct planning question and get a team response.", url_for('contact.contact')),
+      ] %}
+      {% for title, desc, link in links %}
+      <a href="{{ link }}" class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <h2 class="font-serif text-2xl text-bbb-navy mb-2">{{ title }}</h2>
+        <p class="text-sm text-gray-600">{{ desc }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <p class="font-script text-3xl text-bbb-teal mb-2">Planning Map</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Comprehensive Roadmap + Suggested Timeline</h2>
+      <div class="mt-4">
+        <button id="export-roadmap-pdf" class="px-6 py-2.5 rounded-full bg-bbb-navy text-white text-sm font-semibold hover:bg-bbb-teal" style="min-height: 44px;">
+          Export Planning Roadmap (PDF)
+        </button>
+      </div>
+    </div>
+
+    <article class="bg-gradient-to-br from-bbb-cream via-white to-bbb-blush/40 rounded-2xl p-6 mb-8 border border-bbb-sand">
+      <h3 class="font-serif text-2xl text-bbb-navy mb-2">Roadmap Visualization</h3>
+      <p class="text-sm text-gray-600 mb-5">A concierge-style sequence that keeps planning clear, paced, and organized.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 relative">
+        {% set roadmap_stages = [
+          ("Stage 1", "Vision + Date Lock", "Choose package and submit your preferred date.", ["Initial inquiry", "Package comparison", "Primary and backup date windows"]),
+          ("Stage 2", "Design + Guest Experience", "Set menu, florals, and overall styling direction.", ["Menu style + dietary notes", "Florals + decor direction", "Guest count and flow draft"]),
+          ("Stage 3", "Legal + Operations", "Permits, license timing, timeline, and weather backups.", ["Permit/license planning", "Vendor communication cadence", "Logistics and weather fallback"]),
+          ("Stage 4", "Final Week + Wedding Day", "Confirm final details and execute wedding day confidently.", ["Final confirmations", "Payment and timeline lock", "Day-of coordination"]),
+        ] %}
+        {% for stage, title, desc, bullets in roadmap_stages %}
+        <div class="bg-white rounded-xl p-4 border border-bbb-sand relative shadow-sm">
+          <p class="text-xs uppercase tracking-wide text-bbb-teal font-semibold mb-1">{{ stage }}</p>
+          <p class="font-serif text-xl text-bbb-navy mb-2">{{ title }}</p>
+          <p class="text-sm text-gray-600 mb-3">{{ desc }}</p>
+          <div class="space-y-2">
+            {% for bullet in bullets %}
+            <p class="text-xs text-gray-700 bg-bbb-cream rounded-lg px-2.5 py-1.5">{{ bullet }}</p>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="rounded-2xl border border-bbb-sand bg-white p-6 shadow-sm mb-8">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
+        <div>
+          <h3 class="font-serif text-2xl text-bbb-navy">Suggested Timeline Builder</h3>
+          <p class="text-sm text-gray-600">Pick your wedding date to generate recommended milestone target dates and spacing.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="timeline-preset px-4 py-2 rounded-full text-xs font-semibold bg-bbb-cream border border-bbb-sand" data-months="6" style="min-height: 44px;">6 Month Timeline</button>
+          <button type="button" class="timeline-preset px-4 py-2 rounded-full text-xs font-semibold bg-bbb-cream border border-bbb-sand" data-months="9" style="min-height: 44px;">9 Month Timeline</button>
+          <button type="button" class="timeline-preset px-4 py-2 rounded-full text-xs font-semibold bg-bbb-cream border border-bbb-sand" data-months="12" style="min-height: 44px;">12 Month Timeline</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-4 items-end mb-4">
+        <div>
+          <label for="wedding-date-input" class="form-label">Wedding Date</label>
+          <input id="wedding-date-input" type="date" class="form-input" />
+        </div>
+        <p class="text-sm text-gray-600" id="timeline-summary">Select a date to build your timeline.</p>
+      </div>
+
+      <p class="comparison-swipe-hint md:hidden">Swipe horizontally to review timeline milestones.</p>
+      <div class="comparison-scroll-wrap rounded-xl border border-bbb-sand bg-bbb-cream/40">
+        <table id="planning-timeline-table" class="comparison-table min-w-full text-sm">
+          <thead>
+            <tr class="bg-bbb-cream">
+              <th class="px-4 py-3 text-left font-semibold text-bbb-navy">Milestone</th>
+              <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Recommended Timing</th>
+              <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Gap From Prior</th>
+              <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Suggested Date</th>
+            </tr>
+          </thead>
+          <tbody id="planning-timeline-body">
+            <tr class="border-t border-bbb-sand/70">
+              <td class="px-4 py-3 font-medium text-gray-700">Set your wedding date to generate milestones</td>
+              <td class="px-4 py-3 text-center text-gray-500">-</td>
+              <td class="px-4 py-3 text-center text-gray-500">-</td>
+              <td class="px-4 py-3 text-center text-gray-500">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    {% set rows = [
+      ("Planning Guide", "Early to final week", "Checklist and legal/timeline guidance", url_for('main.planning_guide')),
+      ("FAQ", "Anytime", "Quick answers for common decisions", url_for('about.faq')),
+      ("Booking Form", "Date selection phase", "Secure date + package conversation", url_for('booking.book')),
+      ("Contact Form", "Questions or updates", "Direct planning communication", url_for('contact.contact')),
+    ] %}
+    <div class="space-y-3 md:hidden">
+      {% for name, timing, purpose, link in rows %}
+      <article class="rounded-2xl border border-bbb-sand bg-white p-4 shadow-sm">
+        <h3 class="font-serif text-xl font-semibold text-bbb-navy mb-2">{{ name }}</h3>
+        <dl class="space-y-1.5 text-sm">
+          <div><dt class="inline font-semibold text-gray-700">Best Timing:</dt> <dd class="inline text-gray-600">{{ timing }}</dd></div>
+          <div><dt class="inline font-semibold text-gray-700">Main Purpose:</dt> <dd class="inline text-gray-600">{{ purpose }}</dd></div>
+        </dl>
+        <a href="{{ link }}" class="mobile-cta-link mt-3">View Details</a>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="hidden md:block comparison-scroll-wrap rounded-2xl border border-bbb-sand bg-white shadow-sm">
+      <table id="planning-resource-table" class="comparison-table min-w-full text-sm">
+        <thead>
+          <tr class="bg-bbb-cream">
+            <th class="px-4 py-3 text-left font-semibold text-bbb-navy">Resource</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Best Timing</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Main Purpose</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, timing, purpose, link in rows %}
+          <tr class="border-t border-bbb-sand/70">
+            <td class="px-4 py-3 font-medium text-gray-700">{{ name }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ timing }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ purpose }}</td>
+            <td class="px-4 py-3 text-center"><a href="{{ link }}" class="mobile-cta-link">View Details</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  (function () {
+    const btn = document.getElementById('export-roadmap-pdf');
+    const resourcesTable = document.getElementById('planning-resource-table');
+    const timelineBody = document.getElementById('planning-timeline-body');
+    const timelineSummary = document.getElementById('timeline-summary');
+    const weddingDateInput = document.getElementById('wedding-date-input');
+    const presets = document.querySelectorAll('.timeline-preset');
+    if (!btn || !resourcesTable) return;
+
+    const MILESTONES = [
+      { label: 'Define wedding vision + budget range', daysBefore: 360 },
+      { label: 'Secure package + date window', daysBefore: 330 },
+      { label: 'Guest list draft + experience goals', daysBefore: 300 },
+      { label: 'Venue layout + ceremony flow', daysBefore: 240 },
+      { label: 'Catering menu direction confirmed', daysBefore: 180 },
+      { label: 'Florals + decor concept finalized', daysBefore: 150 },
+      { label: 'Permits and legal timeline review', daysBefore: 120 },
+      { label: 'Send invitations', daysBefore: 90 },
+      { label: 'Finalize vendor confirmations', daysBefore: 45 },
+      { label: 'Final headcount + payments', daysBefore: 30 },
+      { label: 'Approve weather backup + day-of run sheet', daysBefore: 14 },
+      { label: 'Final check-in with planner', daysBefore: 7 }
+    ];
+
+    function humanDays(days) {
+      if (days >= 30) {
+        const months = Math.round(days / 30);
+        return `~${months} month${months === 1 ? '' : 's'} before`;
+      }
+      return `${days} day${days === 1 ? '' : 's'} before`;
+    }
+
+    function formatDate(d) {
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+        if (existing) {
+          resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function ensurePdfDependencies() {
+      if (window.jspdf && window.jspdf.jsPDF) return;
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+    }
+
+    function renderTimeline() {
+      if (!weddingDateInput || !timelineBody || !timelineSummary) return;
+      if (!weddingDateInput.value) {
+        timelineSummary.textContent = 'Select a date to build your timeline.';
+        timelineBody.innerHTML = `
+          <tr class="border-t border-bbb-sand/70">
+            <td class="px-4 py-3 font-medium text-gray-700">Set your wedding date to generate milestones</td>
+            <td class="px-4 py-3 text-center text-gray-500">-</td>
+            <td class="px-4 py-3 text-center text-gray-500">-</td>
+            <td class="px-4 py-3 text-center text-gray-500">-</td>
+          </tr>
+        `;
+        return;
+      }
+
+      const weddingDate = new Date(`${weddingDateInput.value}T00:00:00`);
+      const sorted = [...MILESTONES].sort((a, b) => b.daysBefore - a.daysBefore);
+      const rows = [];
+      let priorDays = null;
+
+      sorted.forEach((milestone) => {
+        const suggested = new Date(weddingDate);
+        suggested.setDate(suggested.getDate() - milestone.daysBefore);
+        const gap = priorDays === null ? '-' : `${priorDays - milestone.daysBefore} days`;
+        priorDays = milestone.daysBefore;
+        rows.push(`
+          <tr class="border-t border-bbb-sand/70">
+            <td class="px-4 py-3 font-medium text-gray-700">${milestone.label}</td>
+            <td class="px-4 py-3 text-center text-gray-600">${humanDays(milestone.daysBefore)}</td>
+            <td class="px-4 py-3 text-center text-gray-600">${gap}</td>
+            <td class="px-4 py-3 text-center text-bbb-navy font-semibold">${formatDate(suggested)}</td>
+          </tr>
+        `);
+      });
+
+      timelineBody.innerHTML = rows.join('');
+      timelineSummary.textContent = `Suggested pacing for ${formatDate(weddingDate)} with milestone spacing from vision stage through final week confirmation.`;
+    }
+
+    if (weddingDateInput) {
+      weddingDateInput.addEventListener('change', renderTimeline);
+    }
+
+    presets.forEach((preset) => {
+      preset.addEventListener('click', function () {
+        const months = Number(preset.dataset.months || 9);
+        const target = new Date();
+        target.setMonth(target.getMonth() + months);
+        const yyyy = target.getFullYear();
+        const mm = String(target.getMonth() + 1).padStart(2, '0');
+        const dd = String(target.getDate()).padStart(2, '0');
+        weddingDateInput.value = `${yyyy}-${mm}-${dd}`;
+        renderTimeline();
+      });
+    });
+
+    renderTimeline();
+
+    btn.addEventListener('click', async function () {
+      btn.disabled = true;
+      btn.textContent = 'Preparing PDF...';
+      try {
+        await ensurePdfDependencies();
+      } catch (_err) {
+        btn.disabled = false;
+        btn.textContent = 'Export Planning Roadmap (PDF)';
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+      doc.setFontSize(16);
+      doc.text('ELDA Wedding Sites - Planning Roadmap', 40, 44);
+      doc.setFontSize(10);
+      doc.text('Wedding Planning Template', 40, 62);
+
+      doc.autoTable({
+        html: '#planning-resource-table',
+        startY: 80,
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 6 },
+        headStyles: { fillColor: [39, 52, 69] },
+      });
+
+      const startY = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 80) + 24;
+      doc.setFontSize(13);
+      doc.text('Suggested Timeline', 40, startY);
+      doc.setFontSize(9);
+      doc.text((timelineSummary && timelineSummary.textContent) || '', 40, startY + 14);
+      doc.autoTable({
+        html: '#planning-timeline-table',
+        startY: startY + 24,
+        theme: 'grid',
+        styles: { fontSize: 8.5, cellPadding: 5 },
+        headStyles: { fillColor: [136, 160, 150] },
+      });
+
+      doc.save('wedding-planning-roadmap.pdf');
+      btn.disabled = false;
+      btn.textContent = 'Export Planning Roadmap (PDF)';
+    });
+  })();
+</script>
+{% endblock %}

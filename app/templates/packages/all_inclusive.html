@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Ceremony Package G{% endblock %}
+{% block content %}
+{% set hero_script_line = "Featured Package" %}
+{% set hero_title = "Ceremony Package G" %}
+{% set hero_subtitle = "Template combined-service package with ceremony and venue support." %}
+{% set hero_bg = url_for('static', filename='images/venue/coastal59-room.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-4">What This Covers</h2>
+      <ul class="text-sm text-gray-700 space-y-2 mb-4">
+        <li>• Ceremony + reception planning structure</li>
+        <li>• Primary venue coordination</li>
+        <li>• Floral scope planning</li>
+        <li>• Event planning workflow</li>
+        <li>• Multi-vendor coordination support</li>
+      </ul>
+      <a href="{{ url_for('booking.service_request', request_type='package') }}?service=package-g" class="px-8 py-3 bg-bbb-teal text-white rounded-full font-semibold">Request This Package</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

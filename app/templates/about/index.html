@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block meta_desc %}Learn about ELDA Wedding Sites, a wedding planning team with 25+ years of experience in ceremonies, florals, venue, and vendor coordination.{% endblock %}
+{% block content %}
+{% set hero_script_line = "About ELDA Wedding Sites" %}
+{% set hero_title = "Wedding Planning with Precision & Heart" %}
+{% set hero_subtitle = "We are a full-service wedding team focused on simpler planning, clearer communication, and beautiful execution." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div class="bg-white rounded-3xl p-8 shadow-sm">
+        <h2 class="font-serif text-3xl text-bbb-navy mb-4">Our Approach</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          ELDA Wedding Sites has been part of the wedding industry for over 25 years.
+          We focus on connected workflows, dependable vendor coordination, and practical planning that keeps couples confident.
+        </p>
+        <p class="text-gray-600 leading-relaxed">
+          We support both intimate ceremonies and larger event timelines through a team of 15 to 20 professionals,
+          plus preferred and backup vendor relationships across local markets.
+        </p>
+      </div>
+      <div class="bg-white rounded-3xl p-8 shadow-sm">
+        <h2 class="font-serif text-3xl text-bbb-navy mb-4">What Matters Most</h2>
+        <ul class="space-y-3 text-sm text-gray-600">
+          <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>User-friendly planning from first inquiry to wedding day.</span></li>
+          <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Transparent process for communication, files, and milestones.</span></li>
+          <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Automated handoffs wherever possible to reduce manual work.</span></li>
+          <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>A planning experience that still feels personalized and warm.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

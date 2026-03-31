@@ -1,0 +1,26 @@
+<section class="bg-white/80 border-y border-bbb-sand">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap items-center gap-2 py-3">
+      <a href="{{ url_for('client.dashboard') }}"
+         class="px-4 py-2 rounded-full text-sm font-semibold transition-colors {% if request.path == '/client/dashboard' %}bg-bbb-navy text-white{% else %}bg-bbb-cream text-bbb-navy hover:bg-bbb-sand{% endif %}">
+        Dashboard
+      </a>
+      <a href="{{ url_for('client.plan') }}"
+         class="px-4 py-2 rounded-full text-sm font-semibold transition-colors {% if request.path == '/client/plan' %}bg-bbb-navy text-white{% else %}bg-bbb-cream text-bbb-navy hover:bg-bbb-sand{% endif %}">
+        Wedding Plan
+      </a>
+      <a href="{{ url_for('client.inspiration') }}"
+         class="px-4 py-2 rounded-full text-sm font-semibold transition-colors {% if request.path == '/client/inspiration' %}bg-bbb-navy text-white{% else %}bg-bbb-cream text-bbb-navy hover:bg-bbb-sand{% endif %}">
+        Inspiration
+      </a>
+      <a href="{{ url_for('client.messages') }}"
+         class="px-4 py-2 rounded-full text-sm font-semibold transition-colors {% if request.path == '/client/messages' %}bg-bbb-navy text-white{% else %}bg-bbb-cream text-bbb-navy hover:bg-bbb-sand{% endif %}">
+        Message Planner
+      </a>
+      <a href="{{ url_for('booking.book') }}"
+         class="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-bbb-teal text-white hover:bg-bbb-teal-dark">
+        New Booking
+      </a>
+    </div>
+  </div>
+</section>

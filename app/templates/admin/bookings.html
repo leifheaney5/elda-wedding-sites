@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% block title %}Bookings{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Booking Requests</h1>
+  <a href="{{ url_for('admin.export_bookings_csv') }}" class="px-4 py-2 text-sm rounded-full border border-bbb-teal text-bbb-teal">Export CSV</a>
+</div>
+
+<form method="GET" class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">
+  <label for="bookings-search" class="sr-only">Search bookings</label>
+  <input id="bookings-search" type="text" name="q" value="{{ q }}" placeholder="Search couple, email, package" class="form-input sm:col-span-2" />
+  <label for="bookings-status" class="sr-only">Filter bookings by status</label>
+  <select id="bookings-status" class="form-input" name="status">
+    <option value="">All statuses</option>
+    {% for status in statuses %}
+    <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+    {% endfor %}
+  </select>
+  <button class="px-4 py-2 text-sm rounded-full bg-bbb-teal text-white sm:col-span-3 sm:justify-self-start">Apply Filters</button>
+</form>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Couple</th>
+        <th class="px-4 py-3">Package</th>
+        <th class="px-4 py-3">Wedding Date</th>
+        <th class="px-4 py-3">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in bookings.items %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3"><a class="text-bbb-teal" href="{{ url_for('admin.booking_detail', id=item.id) }}">{{ item.couple_name }}</a></td>
+        <td class="px-4 py-3">{{ item.package_id or "-" }}</td>
+        <td class="px-4 py-3">{{ item.wedding_date or "-" }}</td>
+        <td class="px-4 py-3">{{ item.status }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="px-4 py-6 text-gray-500" colspan="4">No booking requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if bookings.pages > 1 %}
+<div class="flex items-center gap-2 mt-4">
+  {% for p in range(1, bookings.pages + 1) %}
+  <a class="px-3 py-1 rounded border text-sm {% if p == bookings.page %}bg-bbb-navy text-white border-bbb-navy{% else %}bg-white border-gray-300{% endif %}"
+     href="{{ url_for('admin.bookings', page=p, status=status_filter or None, q=q or None) }}">{{ p }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

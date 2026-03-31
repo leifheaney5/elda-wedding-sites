@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" role="img" aria-labelledby="title desc">
+  <title id="title">ELDA Wedding Sites Primary Logo</title>
+  <desc id="desc">Interlocking ring emblem with ELDA wordmark for light backgrounds.</desc>
+  <defs>
+    <linearGradient id="eldaGoldPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DCC08A"/>
+      <stop offset="100%" stop-color="#B38B4E"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="104" cy="120" r="45" stroke="#1A2E44" stroke-width="8"/>
+    <circle cx="148" cy="120" r="45" stroke="url(#eldaGoldPrimary)" stroke-width="8"/>
+    <path d="M94 96h15c11 0 20 3 25 9 5 5 7 10 7 16 0 8-3 15-9 21-6 5-15 8-26 8H94V96zm11 10v34h2c7 0 12-2 16-5 4-3 6-8 6-13 0-5-2-9-6-12-4-3-9-4-16-4h-2z" fill="#1A2E44"/>
+
+    <text x="250" y="112" fill="#1A2E44" font-size="70" font-weight="600" font-family="Cormorant Garamond, Georgia, serif" letter-spacing="2.4">ELDA</text>
+    <line x1="252" y1="130" x2="586" y2="130" stroke="#B38B4E" stroke-width="2"/>
+    <text x="252" y="166" fill="#4A9B8E" font-size="24" font-weight="600" font-family="Manrope, Segoe UI, Arial, sans-serif" letter-spacing="4.4">WEDDING SITES</text>
+  </g>
+</svg>

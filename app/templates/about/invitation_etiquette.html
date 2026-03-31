@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Invitation Etiquette{% endblock %}
+{% block content %}
+{% set hero_script_line = "Planning Guidance" %}
+{% set hero_title = "Invitation Etiquette" %}
+{% set hero_subtitle = "Simple invitation timing and etiquette basics to keep your planning process smooth." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-3xl p-8 shadow-sm">
+    <ul class="space-y-3 text-sm text-gray-600">
+      <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Send save-the-dates 6 to 8 months before your wedding date.</span></li>
+      <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Mail formal invitations 8 to 10 weeks before the event.</span></li>
+      <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Set RSVP deadlines 3 to 4 weeks before the wedding.</span></li>
+      <li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span><span>Confirm final counts with vendors after RSVP close.</span></li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

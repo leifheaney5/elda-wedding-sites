@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Users{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Admin Users</h1>
+  <a href="{{ url_for('admin.new_user') }}" class="px-5 py-2 rounded-full bg-bbb-teal text-white">New Admin</a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Name</th>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3">Role</th>
+        <th class="px-4 py-3">Status</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3">{{ user.name }}</td>
+        <td class="px-4 py-3">{{ user.email }}</td>
+        <td class="px-4 py-3">{{ user.role }}</td>
+        <td class="px-4 py-3">{{ "Active" if user.is_active else "Inactive" }}</td>
+        <td class="px-4 py-3">
+          <form method="POST" action="{{ url_for('admin.toggle_user', id=user.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="text-bbb-teal" data-confirm="Toggle this admin account?">Toggle</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ELDA Custom Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #1f2937; margin: 28px; }
+    h1, h2 { margin: 0 0 8px; }
+    .muted { color: #6b7280; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; margin-top: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; border-bottom: 1px solid #e5e7eb; padding: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>ELDA Wedding Sites — Custom Report</h1>
+  <p class="muted">Dataset: {{ dataset_label }}</p>
+  <p class="muted">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M UTC') }}</p>
+
+  <section class="card">
+    <h2>Summary</h2>
+    <p>Total rows: {{ report.row_count }}</p>
+    <p>Visualization mode: {{ report.viz_type.replace('_', ' ').title() }}</p>
+  </section>
+
+  <section class="card">
+    <h2>Rows</h2>
+    <table>
+      <tr>
+        {% for field in report.selected_fields %}
+        <th>{{ report.field_labels[field] }}</th>
+        {% endfor %}
+      </tr>
+      {% for row in report.rows %}
+      <tr>
+        {% for field in report.selected_fields %}
+        <td>{{ row[field] }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+</body>
+</html>

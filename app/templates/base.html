@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% set base_title = self.title()|striptags|trim %}
+  {% set full_title = base_title ~ " | Wedding Template" if base_title else "ELDA Wedding Sites | Wedding Template" %}
+  {% set canonical_url = (site_url ~ request.path) if site_url else request.base_url %}
+  {% set default_desc = "Template wedding website with reusable package, venue, planning, and inquiry flows for customization." %}
+  {% set robots_value = "noindex, nofollow" if request.path.startswith('/admin') or request.path.startswith('/client') else "index, follow" %}
+  <title>{{ full_title }}</title>
+  <meta name="description" content="{% block meta_desc %}{{ default_desc }}{% endblock %}" />
+  <meta name="robots" content="{% block meta_robots %}{{ robots_value }}{% endblock %}" />
+  <meta name="author" content="ELDA Wedding Sites" />
+  <meta name="theme-color" content="#88A096" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ELDA Wedding Sites" />
+  <meta property="og:title" content="{{ full_title }}" />
+  <meta property="og:description" content="{% block og_desc %}{{ default_desc }}{% endblock %}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  <meta property="og:image" content="{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{ full_title }}" />
+  <meta name="twitter:description" content="{% block twitter_desc %}{{ default_desc }}{% endblock %}" />
+  <meta name="twitter:image" content="{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}" />
+  {% if site_url %}
+  <link rel="canonical" href="{{ canonical_url }}" />
+  {% endif %}
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.generated.css') }}" />
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "ELDA Wedding Sites",
+    "url": "{{ site_url }}",
+    "image": "{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}",
+    "telephone": "+1-443-614-4783",
+    "email": "info@eldaweddingsites.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Example Avenue Suite 100",
+      "addressLocality": "Example City",
+      "addressRegion": "ST",
+      "postalCode": "00000",
+      "addressCountry": "US"
+    },
+    "areaServed": "Regional service area",
+    "priceRange": "$$"
+  }
+  </script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-bbb-cream font-sans text-bbb-text antialiased">
+
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  {% if site_announcement %}
+  <section class="bg-bbb-navy text-white">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <p class="text-sm md:text-base">
+        <span class="font-semibold">{{ site_announcement.title }}:</span>
+        {{ site_announcement.message }}
+      </p>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="fixed top-20 right-4 z-50 space-y-2 max-w-sm" id="flash-container">
+        {% for category, message in messages %}
+          <div class="flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-sans
+            {% if category == 'success' %}bg-bbb-teal text-white
+            {% elif category == 'error' %}bg-bbb-coral text-white
+            {% else %}bg-bbb-navy text-white{% endif %}"
+            data-flash-message>
+            <span class="flex-1">{{ message }}</span>
+            <button type="button" data-dismiss-flash class="opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Page Content -->
+  <main class="pb-24 lg:pb-0">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'components/mobile_action_bar.html' %}
+
+  <!-- Footer -->
+  {% include 'components/footer.html' %}
+
+  <!-- Global JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,61 @@
+{# Embeddable contact form — used on contact page and optionally elsewhere #}
+<form method="POST" action="{{ url_for('contact.contact') }}" class="space-y-5">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <label class="form-label" for="name">Full Name <span class="text-bbb-coral">*</span></label>
+      <input class="form-input" type="text" id="name" name="name" placeholder="Jane & John Smith" required />
+    </div>
+    <div>
+      <label class="form-label" for="email">Email Address <span class="text-bbb-coral">*</span></label>
+      <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required />
+    </div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <label class="form-label" for="phone">Phone Number</label>
+      <input class="form-input" type="tel" id="phone" name="phone" placeholder="(555) 123-4567" />
+    </div>
+    <div>
+      <label class="form-label" for="subject">Subject</label>
+      <input class="form-input" type="text" id="subject" name="subject" placeholder="What can we help with?" />
+    </div>
+  </div>
+  <div>
+    <label class="form-label" for="message">Message <span class="text-bbb-coral">*</span></label>
+    <textarea class="form-input resize-none" id="message" name="message" rows="5"
+              placeholder="Tell us about your dream wedding..." required></textarea>
+  </div>
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label class="form-label mb-0">Services Interested In</label>
+      <button type="button" id="services-select-all" class="services-toggle-btn">Select All</button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-bbb-cream rounded-xl p-3">
+      {% for value, label in service_options %}
+      <label class="service-option-chip text-sm">
+        <input type="checkbox" name="services_interested" value="{{ label }}" class="services-checkbox" />
+        <span>{{ label }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  <button type="submit"
+          class="w-full sm:w-auto px-10 py-3.5 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors shadow-md hover:shadow-lg">
+    Send Message
+  </button>
+</form>
+
+<script>
+  (function () {
+    const toggle = document.getElementById("services-select-all");
+    const boxes = document.querySelectorAll(".services-checkbox");
+    if (!toggle || !boxes.length) return;
+
+    toggle.addEventListener("click", function () {
+      const allChecked = Array.from(boxes).every((b) => b.checked);
+      boxes.forEach((b) => { b.checked = !allChecked; });
+      toggle.textContent = allChecked ? "Select All" : "Clear All";
+    });
+  })();
+</script>

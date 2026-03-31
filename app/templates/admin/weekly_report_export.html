@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ELDA Weekly Business Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #1f2937; margin: 28px; }
+    h1, h2, h3 { margin: 0 0 8px; }
+    .muted { color: #6b7280; }
+    .grid { display: grid; gap: 12px; }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; }
+    .metric { font-size: 28px; font-weight: 700; margin-top: 6px; color: #1A2E44; }
+    .row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .track { height: 10px; border-radius: 999px; background: #f3f4f6; overflow: hidden; }
+    .bar { height: 10px; }
+    .bar-c { background: #4A9B8E; }
+    .bar-b { background: #1A2E44; }
+    .bar-s { background: #E07B6A; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; border-bottom: 1px solid #e5e7eb; padding: 8px; font-size: 13px; }
+    .section { margin-top: 22px; }
+  </style>
+</head>
+<body>
+  <h1>ELDA Wedding Sites — Weekly Business Report</h1>
+  <p class="muted">Reporting window: {{ report.week_start.strftime('%b %d, %Y') }} → {{ report.week_ending.strftime('%b %d, %Y') }}</p>
+  <p class="muted">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M UTC') }}</p>
+
+  <section class="section card">
+    <h2>Executive Summary</h2>
+    <p>{{ report.executive_summary }}</p>
+    <p class="muted" style="margin-top:8px;">
+      Week-over-week vs {{ report.previous_window.week_start.strftime('%b %d, %Y') }} → {{ report.previous_window.week_ending.strftime('%b %d, %Y') }}:
+      Leads {{ '+' if report.comparison.leads_pct >= 0 else '' }}{{ report.comparison.leads_pct }}%,
+      Bookings {{ '+' if report.comparison.bookings_pct >= 0 else '' }}{{ report.comparison.bookings_pct }}%,
+      Revenue {{ '+' if report.comparison.revenue_pct >= 0 else '' }}{{ report.comparison.revenue_pct }}%,
+      Conversion {{ '+' if report.comparison.conversion_pct >= 0 else '' }}{{ report.comparison.conversion_pct }} pts.
+    </p>
+  </section>
+
+  <section class="grid grid-4 section">
+    <div class="card"><div class="muted">Total Leads</div><div class="metric">{{ report.kpi.total_leads }}</div></div>
+    <div class="card"><div class="muted">Bookings</div><div class="metric">{{ report.kpi.bookings }}</div></div>
+    <div class="card"><div class="muted">Conversion</div><div class="metric">{{ report.kpi.booking_conversion_pct }}%</div></div>
+    <div class="card"><div class="muted">Revenue</div><div class="metric">${{ '%.2f'|format(report.kpi.realized_revenue_dollars) }}</div></div>
+  </section>
+
+  <section class="section">
+    <h2>Daily Activity Visualization</h2>
+    {% for i in range(report.day_labels|length) %}
+    <div class="row">
+      <div class="muted">{{ report.day_labels[i] }}</div>
+      <div>
+        <progress max="{{ report.max_values.contacts }}" value="{{ report.contacts_daily[i] }}" style="width:100%;"></progress>
+        <progress max="{{ report.max_values.bookings }}" value="{{ report.bookings_daily[i] }}" style="width:100%; margin-top:5px;"></progress>
+        <progress max="{{ report.max_values.services }}" value="{{ report.services_daily[i] }}" style="width:100%; margin-top:5px;"></progress>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section class="section grid" style="grid-template-columns:1fr 1fr;">
+    <div class="card">
+      <h3>Booking Status Mix</h3>
+      <table>
+        <tr><th>Status</th><th>Count</th></tr>
+        <tr><td>New</td><td>{{ report.booking_status_counts.new }}</td></tr>
+        <tr><td>Reviewing</td><td>{{ report.booking_status_counts.reviewing }}</td></tr>
+        <tr><td>Confirmed</td><td>{{ report.booking_status_counts.confirmed }}</td></tr>
+        <tr><td>Cancelled</td><td>{{ report.booking_status_counts.cancelled }}</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Service Request Mix</h3>
+      <table>
+        <tr><th>Type</th><th>Count</th></tr>
+        <tr><td>Package</td><td>{{ report.service_mix_counts.package }}</td></tr>
+        <tr><td>Venue</td><td>{{ report.service_mix_counts.venue }}</td></tr>
+        <tr><td>Catering</td><td>{{ report.service_mix_counts.catering }}</td></tr>
+        <tr><td>Florals</td><td>{{ report.service_mix_counts.florals }}</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Operational Highlights</h2>
+    <table>
+      <tr><th>Recent Leads</th><th>Recent Bookings</th><th>Recent Service Requests</th></tr>
+      {% set max_rows = [report.top_contacts|length, report.top_bookings|length, report.top_services|length]|max %}
+      {% for idx in range(max_rows) %}
+      <tr>
+        <td>{% if report.top_contacts|length > idx %}{{ report.top_contacts[idx].name }} — {{ report.top_contacts[idx].email }}{% endif %}</td>
+        <td>{% if report.top_bookings|length > idx %}{{ report.top_bookings[idx].couple_name }} — {{ report.top_bookings[idx].status }}{% endif %}</td>
+        <td>{% if report.top_services|length > idx %}{{ report.top_services[idx].name }} — {{ report.top_services[idx].request_type }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>Recommended Actions</h2>
+    <table>
+      <tr><th>Priority</th><th>Action</th><th>Detail</th></tr>
+      {% for action in report.actions %}
+      <tr>
+        <td>{{ action.level.title() }}</td>
+        <td>{{ action.title }}</td>
+        <td>{{ action.detail }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+</body>
+</html>

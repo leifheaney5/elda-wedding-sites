@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block title %}Payments{% endblock %}
+{% block admin_content %}
+<h1 class="font-serif text-4xl text-bbb-navy mb-6">Payments</h1>
+
+<div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+  <article class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-xs text-gray-500">Paid</p><p class="font-serif text-2xl">{{ summary.paid_count }}</p></article>
+  <article class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-xs text-gray-500">Pending</p><p class="font-serif text-2xl">{{ summary.pending_count }}</p></article>
+  <article class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-xs text-gray-500">Failed</p><p class="font-serif text-2xl">{{ summary.failed_count }}</p></article>
+  <article class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-xs text-gray-500">Refunded</p><p class="font-serif text-2xl">{{ summary.refunded_count }}</p></article>
+  <article class="bg-white rounded-2xl p-4 shadow-sm col-span-2 xl:col-span-1"><p class="text-xs text-gray-500">Paid Revenue</p><p class="font-serif text-2xl">${{ '%.2f'|format(summary.paid_revenue_cents / 100) }}</p></article>
+</div>
+
+<div class="flex items-center justify-between mb-4">
+  <form method="GET" class="flex items-center gap-3">
+    <label for="payments-status" class="sr-only">Filter payments by status</label>
+    <select id="payments-status" class="form-input" name="status">
+      <option value="">All transaction statuses</option>
+      {% for status in statuses %}
+      <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+      {% endfor %}
+    </select>
+    <button class="px-4 py-2 text-sm rounded-full bg-bbb-teal text-white">Apply</button>
+  </form>
+  <a href="{{ url_for('admin.export_payments_csv') }}" class="px-4 py-2 text-sm rounded-full border border-bbb-teal text-bbb-teal">Export CSV</a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">ID</th>
+        <th class="px-4 py-3">Booking</th>
+        <th class="px-4 py-3">Stripe ID</th>
+        <th class="px-4 py-3">Amount</th>
+        <th class="px-4 py-3">Currency</th>
+        <th class="px-4 py-3">Status</th>
+        <th class="px-4 py-3">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for payment in payments.items %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3">#{{ payment.id }}</td>
+        <td class="px-4 py-3">
+          {% if payment.booking_id %}
+          <a class="text-bbb-teal" href="{{ url_for('admin.booking_detail', id=payment.booking_id) }}">#{{ payment.booking_id }}</a>
+          {% else %}-{% endif %}
+        </td>
+        <td class="px-4 py-3 text-xs text-gray-500">{{ payment.stripe_payment_intent_id or "-" }}</td>
+        <td class="px-4 py-3">${{ '%.2f'|format(payment.amount_dollars) }}</td>
+        <td class="px-4 py-3 uppercase">{{ payment.currency }}</td>
+        <td class="px-4 py-3">{{ payment.status }}</td>
+        <td class="px-4 py-3">{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="px-4 py-6 text-gray-500" colspan="7">No payments recorded yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if payments.pages > 1 %}
+<div class="flex items-center gap-2 mt-4">
+  {% for p in range(1, payments.pages + 1) %}
+  <a class="px-3 py-1 rounded border text-sm {% if p == payments.page %}bg-bbb-navy text-white border-bbb-navy{% else %}bg-white border-gray-300{% endif %}"
+     href="{{ url_for('admin.payments', page=p, status=status_filter or None) }}">{{ p }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% block title %}How do I...{% endblock %}
+{% block admin_content %}
+<h1 class="font-serif text-4xl text-bbb-navy mb-6">How do I...</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Respond to a client message</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Open `Contacts` in the left menu.</li>
+      <li>Use `Portal Messages` or `Unread Only` to filter.</li>
+      <li>Select the contact name to open the thread.</li>
+      <li>Use `Reply to Client` and submit your response.</li>
+      <li>Optional: attach files with the attachments field.</li>
+    </ol>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Update a booking status</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Open `Bookings` in the left menu.</li>
+      <li>Click the couple name to open booking detail.</li>
+      <li>In `Update Status`, pick the new status.</li>
+      <li>Click `Update`.</li>
+      <li>Add context in `Admin Notes` if needed.</li>
+    </ol>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Review service requests</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Open `Service Requests`.</li>
+      <li>Filter by request type or status.</li>
+      <li>Open an item by clicking the requester name.</li>
+      <li>Update status and save notes on the detail page.</li>
+    </ol>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Export operational data</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Navigate to `Contacts`, `Bookings`, `Payments`, or `Service Requests`.</li>
+      <li>Click `Export CSV` in the page header.</li>
+      <li>Save the generated file and share internally.</li>
+    </ol>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Review client inspiration boards</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Open `Inspiration Boards`.</li>
+      <li>Search by client name, email, color palette, or theme.</li>
+      <li>Open the board to view selected colors, florals, and notes.</li>
+    </ol>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Manage admin users (owner only)</h2>
+    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+      <li>Open `Admin Users` from the side menu.</li>
+      <li>Click `New Admin` to create an account.</li>
+      <li>Use `Toggle` to activate/deactivate staff accounts.</li>
+      <li>Never share credentials across multiple people.</li>
+    </ol>
+  </article>
+</div>
+{% endblock %}

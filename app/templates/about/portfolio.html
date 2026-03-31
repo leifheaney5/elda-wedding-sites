@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Portfolio{% endblock %}
+{% block content %}
+{% set hero_script_line = "Real Celebrations" %}
+{% set hero_title = "Portfolio" %}
+{% set hero_subtitle = "A look at ceremony styling, venue setups, and reception design direction across recent events." %}
+{% set hero_bg = url_for('static', filename='images/gallery/portfolio-1.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% set samples = [
+        ("Ceremony arch styling", "gallery/portfolio-1.jpg"),
+        ("Reception design styling", "venue/reception.jpg"),
+        ("Neutral and floral tablescapes", "florals/floral-feature.jpg"),
+        ("Intimate dinner settings", "venue/intimate-dinner.jpg"),
+        ("Elopement portraits", "gallery/elopement-oceanside.jpg"),
+        ("Ceremony moments", "gallery/portfolio-2.jpg")
+      ] %}
+      {% for sample, image in samples %}
+      <article class="bg-white rounded-2xl p-4 shadow-sm">
+        <img src="{{ url_for('static', filename='images/' ~ image) }}" alt="{{ sample }}" class="w-full h-44 object-cover rounded-xl mb-4" />
+        <h2 class="font-serif text-2xl text-bbb-navy mb-2">{{ sample }}</h2>
+        <p class="text-sm text-gray-600">Captured moments and setups inspired by the original ELDA Wedding Sites visual style.</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

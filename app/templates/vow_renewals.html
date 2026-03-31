@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Vow Renewals{% endblock %}
+{% block content %}
+{% set hero_script_line = "Vow Renewal Experience" %}
+{% set hero_title = "Vow Renewal Experiences" %}
+{% set hero_subtitle = "Say “I Still Do” with ELDA Wedding Sites." %}
+{% set hero_bg = url_for('static', filename='images/gallery/elopement-oceanside.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm space-y-5">
+      <p class="text-gray-700 leading-relaxed">
+        Reignite your love story with a personalized vow renewal ceremony. ELDA Wedding Sites describes vow renewals
+        as stress-free, meaningful, and customizable with ceremony setup, officiant service, florals,
+        photography, and on-site coordination.
+      </p>
+      <h2 class="font-serif text-2xl text-bbb-navy">Highlights Included in Most Vow Renewal Packages</h2>
+      <ul class="text-sm text-gray-700 space-y-2">
+        <li>• Professional ceremony setup (chairs, arbor, decor, signage)</li>
+        <li>• Officiant service and personalized ceremony script</li>
+        <li>• Floral design by ELDA Florals</li>
+        <li>• Photography by in-house team</li>
+        <li>• On-site coordination</li>
+      </ul>
+      <div class="pt-2">
+        <a href="{{ url_for('contact.contact') }}" class="px-8 py-3 bg-bbb-teal text-white rounded-full font-semibold">Request a Vow Renewal Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

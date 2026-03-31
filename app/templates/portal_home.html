@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Portal{% endblock %}
+{% block meta_desc %}Access the ELDA Wedding Sites portals: client dashboard for planning/finances/communications and admin dashboard for business operations.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Portal Access" %}
+{% set hero_title = "Client and Admin Portals" %}
+{% set hero_subtitle = "Select your experience and step into a streamlined planning workspace." %}
+{% set hero_bg = url_for('static', filename='images/venue/coastal59-room.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-gradient-to-b from-bbb-cream via-[#f9f6f3] to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <article class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-[0.2em] text-bbb-teal font-semibold mb-2">For Couples</p>
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">Client Portal</h2>
+      <p class="text-sm text-gray-600 mb-4">A private wedding workspace designed to feel calm, guided, and easy to revisit.</p>
+      <ul class="space-y-2 text-sm text-gray-700 mb-6">
+        <li>• Wedding plan tasks and milestone dates</li>
+        <li>• Inspiration board for colors/themes/florals</li>
+        <li>• Plan selections, requests, and communications history</li>
+        <li>• Finance snapshot based on your booking records</li>
+      </ul>
+      <div class="flex flex-wrap gap-3">
+        <a href="{{ url_for('client.login') }}" class="px-6 py-3 bg-bbb-teal text-white rounded-full font-semibold">Client Login</a>
+        {% if client_self_registration_enabled %}
+        <a href="{{ url_for('client.register') }}" class="px-6 py-3 border-2 border-bbb-teal text-bbb-teal rounded-full font-semibold">Create Account</a>
+        {% endif %}
+      </div>
+    </article>
+    <article class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-[0.2em] text-bbb-teal font-semibold mb-2">For Team Operations</p>
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">Admin Portal</h2>
+      <p class="text-sm text-gray-600 mb-4">Business-side controls for leads, bookings, transactions, and workflow visibility.</p>
+      <ul class="space-y-2 text-sm text-gray-700 mb-6">
+        <li>• Lead and contact management</li>
+        <li>• Booking and service-request pipelines</li>
+        <li>• Revenue/transaction dashboard with analytics</li>
+        <li>• CSV exports and team admin controls</li>
+      </ul>
+      <div class="flex flex-wrap gap-3">
+        {% if current_user.is_authenticated and current_user.user_type == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="px-6 py-3 bg-bbb-navy text-white rounded-full font-semibold">Admin Dashboard</a>
+        {% else %}
+        <p class="px-6 py-3 bg-bbb-cream text-bbb-navy rounded-full font-semibold">Admin access is restricted to staff</p>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

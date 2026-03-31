@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Admin{% endblock %} | ELDA Wedding Sites</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.generated.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+</head>
+<body class="bg-bbb-cream text-bbb-text font-sans">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-[260px_1fr]">
+    <aside class="bg-bbb-navy text-white p-6">
+      <a href="{{ url_for('admin.dashboard') }}" class="block font-serif text-2xl mb-6">ELDA Admin</a>
+      <nav class="space-y-2 text-sm">
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.weekly_report') }}">Weekly Report</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.report_studio') }}">Report Studio</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.contacts') }}">Contacts</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.bookings') }}">Bookings</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.vendors') }}">Vendors</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.service_requests') }}">Service Requests</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.inspiration_boards') }}">Inspiration Boards</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.planning_ops') }}">Planning Ops</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.site_manager') }}">Site Manager</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.autopilot') }}">Autopilot</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.communications_center') }}">Communication Center</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.email_campaigns') }}">Email Campaigns</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.payments') }}">Payments</a>
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.how_do_i') }}">How do I...</a>
+        {% if current_user.is_authenticated and current_user.is_owner %}
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.users') }}">Admin Users</a>
+        {% endif %}
+        <a class="block px-3 py-2 rounded hover:bg-white/10" href="{{ url_for('admin.logout') }}">Logout</a>
+      </nav>
+    </aside>
+    <main class="p-6 lg:p-8">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="space-y-2 mb-4">
+        {% for category, message in messages %}
+        <div class="rounded-lg px-4 py-3 text-sm {% if category == 'error' %}bg-red-100 text-red-800{% elif category == 'success' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+      {% block admin_content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  {% block admin_scripts %}{% endblock %}
+</body>
+</html>

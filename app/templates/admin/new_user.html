@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}New Admin User{% endblock %}
+{% block admin_content %}
+<h1 class="font-serif text-4xl text-bbb-navy mb-6">Create Admin User</h1>
+
+<div class="max-w-2xl bg-white rounded-2xl shadow-sm p-6">
+  <form method="POST" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div>
+      <label class="form-label" for="name">Name</label>
+      <input class="form-input" id="name" name="name" type="text" required />
+    </div>
+    <div>
+      <label class="form-label" for="email">Email</label>
+      <input class="form-input" id="email" name="email" type="email" required />
+    </div>
+    <div>
+      <label class="form-label" for="role">Role</label>
+      <select class="form-input" id="role" name="role">
+        <option value="staff">staff</option>
+        <option value="owner">owner</option>
+      </select>
+    </div>
+    <div>
+      <label class="form-label" for="password">Password (min 8 chars)</label>
+      <input class="form-input" id="password" name="password" type="password" required />
+    </div>
+    <button class="px-6 py-3 rounded-full bg-bbb-teal text-white">Create User</button>
+  </form>
+</div>
+{% endblock %}

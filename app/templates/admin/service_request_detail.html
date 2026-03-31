@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}Service Request Detail{% endblock %}
+{% block admin_content %}
+<a class="text-sm text-bbb-teal" href="{{ url_for('admin.service_requests') }}">&larr; Back to service requests</a>
+
+<div class="bg-white rounded-2xl shadow-sm p-6 mt-4">
+  <h1 class="font-serif text-3xl text-bbb-navy mb-2">{{ item.name }}</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ item.email }}{% if item.phone %} • {{ item.phone }}{% endif %}</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+    <p><strong>Request Type:</strong> {{ item.request_type }}</p>
+    <p><strong>Status:</strong> {{ item.status }}</p>
+    <p><strong>Selected Service:</strong> {{ item.selected_service or "-" }}</p>
+    <p><strong>Event Date:</strong> {{ item.event_date or "-" }}</p>
+    <p><strong>Guest Count:</strong> {{ item.guest_count or "-" }}</p>
+    <p><strong>Submitted:</strong> {{ item.submitted_at.strftime('%Y-%m-%d %H:%M') if item.submitted_at else "-" }}</p>
+  </div>
+  {% if item.details %}
+  <div class="mt-4">
+    <p class="text-sm font-semibold">Details</p>
+    <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ item.details }}</p>
+  </div>
+  {% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Update Status</h2>
+    <form method="POST" action="{{ url_for('admin.service_request_status', id=item.id) }}" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <select class="form-input" name="status">
+        <option value="new" {% if item.status == 'new' %}selected{% endif %}>new</option>
+        <option value="reviewing" {% if item.status == 'reviewing' %}selected{% endif %}>reviewing</option>
+        <option value="contacted" {% if item.status == 'contacted' %}selected{% endif %}>contacted</option>
+        <option value="closed" {% if item.status == 'closed' %}selected{% endif %}>closed</option>
+      </select>
+      <button class="px-6 py-2 bg-bbb-teal text-white rounded-full">Update</button>
+    </form>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Admin Notes</h2>
+    <form method="POST" action="{{ url_for('admin.service_request_notes', id=item.id) }}" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <textarea class="form-input resize-none" name="notes" rows="4">{{ item.admin_notes or '' }}</textarea>
+      <button class="px-6 py-2 bg-bbb-teal text-white rounded-full">Save Notes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Wedding Plan{% endblock %}
+{% block content %}
+{% set hero_script_line = "Private Concierge Portal" %}
+{% set hero_title = "Your Wedding Plan Workspace" %}
+{% set hero_subtitle = "Clear milestones, elegant checklist flow, and practical date guidance." %}
+{% include 'components/hero.html' %}
+{% include 'components/client_portal_tabs.html' %}
+
+<section class="py-12 bg-gradient-to-b from-bbb-cream via-[#faf8f5] to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 xl:col-span-2">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Progress</p>
+        <p class="font-serif text-3xl text-bbb-navy mb-3">{{ progress_percent }}%</p>
+        <div class="w-full h-2.5 rounded-full bg-bbb-cream overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-bbb-teal to-bbb-navy" style="width: {{ progress_percent }}%"></div>
+        </div>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Completed</p>
+        <p class="font-serif text-3xl text-bbb-navy">{{ completed }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Total Tasks</p>
+        <p class="font-serif text-3xl text-bbb-navy">{{ total }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Overdue</p>
+        <p class="font-serif text-3xl {% if overdue_count > 0 %}text-rose-700{% else %}text-bbb-navy{% endif %}">{{ overdue_count }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Due in 30 Days</p>
+        <p class="font-serif text-3xl {% if due_soon_count > 0 %}text-amber-700{% else %}text-bbb-navy{% endif %}">{{ due_soon_count }}</p>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-6">
+      <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif text-2xl text-bbb-navy">Checklist</h2>
+          <span class="text-xs uppercase tracking-wide text-gray-500">Prioritize overdue and due-soon items</span>
+        </div>
+        <div class="space-y-3 max-h-[38rem] overflow-auto pr-1">
+          {% for task in tasks %}
+          {% set overdue = (not task.is_completed and task.due_date and task.due_date < now.date()) %}
+          <div class="border rounded-xl p-4 flex items-start justify-between gap-4 {% if overdue %}border-rose-200 bg-rose-50/60{% else %}border-bbb-sand{% endif %}">
+            <div>
+              <p class="font-semibold {% if task.is_completed %}line-through text-gray-500{% else %}text-bbb-navy{% endif %}">
+                {{ task.title }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ task.category or 'General' }}
+                {% if task.due_date %} • Due {{ task.due_date }}{% endif %}
+                {% if task.is_required %} • Required{% else %} • Custom{% endif %}
+              </p>
+              {% if task.notes %}
+              <p class="text-sm text-gray-700 mt-1">{{ task.notes }}</p>
+              {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('client.toggle_task', task_id=task.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="px-3 py-1 rounded-full text-xs font-semibold {% if task.is_completed %}bg-green-100 text-green-700{% else %}bg-bbb-teal text-white{% endif %}">
+                {% if task.is_completed %}Completed{% else %}Mark Done{% endif %}
+              </button>
+            </form>
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">No tasks yet.</p>
+          {% endfor %}
+        </div>
+      </article>
+
+      <div class="space-y-6">
+        <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h2 class="font-serif text-2xl text-bbb-navy mb-4">Important Dates</h2>
+          {% if wedding_date %}
+          <p class="text-sm text-gray-700 mb-3">Wedding Date: <strong>{{ wedding_date }}</strong></p>
+          <div class="space-y-2 text-sm">
+            {% for label, value in important_dates %}
+            <div class="border border-bbb-sand rounded-lg px-3 py-2 flex justify-between">
+              <span class="text-gray-700">{{ label }}</span>
+              <span class="font-semibold text-bbb-navy">{{ value }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">Add a booking with your wedding date to auto-generate milestone dates.</p>
+          {% endif %}
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h2 class="font-serif text-2xl text-bbb-navy mb-4">Add Custom Task</h2>
+          <form method="POST" action="{{ url_for('client.plan') }}" class="space-y-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="add-task" />
+            <label for="custom-task-title" class="sr-only">Task title</label>
+            <input id="custom-task-title" class="form-input" name="title" placeholder="Task title" required />
+            <label for="custom-task-category" class="sr-only">Task category</label>
+            <input id="custom-task-category" class="form-input" name="category" placeholder="Category (e.g., Vendors)" />
+            <label for="custom-task-due-date" class="sr-only">Task due date</label>
+            <input id="custom-task-due-date" class="form-input" type="date" name="due_date" />
+            <label for="custom-task-notes" class="sr-only">Task notes</label>
+            <textarea id="custom-task-notes" class="form-input resize-none" name="notes" rows="3" placeholder="Notes"></textarea>
+            <button type="submit" class="px-5 py-2 rounded-full bg-bbb-teal text-white font-semibold">Add Task</button>
+          </form>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h2 class="font-serif text-2xl text-bbb-navy mb-4">Share Seating List</h2>
+          <p class="text-sm text-gray-600 mb-3">Send your current guest list to your planner for interactive seating setup.</p>
+          <form method="POST" action="{{ url_for('client.plan') }}" class="space-y-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="submit-seating-list" />
+            <label for="seating-title" class="sr-only">Seating list title</label>
+            <input id="seating-title" class="form-input" name="seating_title" placeholder="Reception Seating List" />
+            <label for="seating-guest-list" class="sr-only">Guest list</label>
+            <textarea id="seating-guest-list" class="form-input resize-none" name="guest_list" rows="5" placeholder="Avery Demo&#10;Jordan Demo&#10;Taylor Smith" required></textarea>
+            <label for="seating-notes" class="sr-only">Seating notes</label>
+            <textarea id="seating-notes" class="form-input resize-none" name="seating_notes" rows="3" placeholder="VIP table preferences, accessibility needs, grouped families"></textarea>
+            <button type="submit" class="px-5 py-2 rounded-full bg-bbb-navy text-white font-semibold">Send Seating List</button>
+          </form>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h2 class="font-serif text-2xl text-bbb-navy mb-4">RSVP Manager</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-sm">
+            <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Attending</span><strong class="text-bbb-navy">{{ rsvp_counts.attending }}</strong></div>
+            <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Pending</span><strong class="text-bbb-navy">{{ rsvp_counts.pending }}</strong></div>
+            <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Declined</span><strong class="text-bbb-navy">{{ rsvp_counts.declined }}</strong></div>
+            <div class="rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40"><span class="text-gray-500 block">Maybe</span><strong class="text-bbb-navy">{{ rsvp_counts.maybe }}</strong></div>
+          </div>
+
+          <form method="POST" action="{{ url_for('client.plan') }}" class="space-y-3 border border-bbb-sand rounded-xl p-4 mb-4 bg-bbb-cream/30">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="add-rsvp-guest" />
+            <p class="text-sm font-semibold text-bbb-navy">Add Guest</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label for="rsvp-full-name" class="sr-only">Guest full name</label>
+              <input id="rsvp-full-name" class="form-input" name="full_name" placeholder="Guest full name" required />
+              <label for="rsvp-group-label" class="sr-only">Group or household</label>
+              <input id="rsvp-group-label" class="form-input" name="group_label" placeholder="Group / household" />
+              <label for="rsvp-email" class="sr-only">Guest email</label>
+              <input id="rsvp-email" class="form-input" type="email" name="email" placeholder="Email (optional)" />
+              <label for="rsvp-phone" class="sr-only">Guest phone</label>
+              <input id="rsvp-phone" class="form-input" name="phone" placeholder="Phone (optional)" />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label for="rsvp-meal-choice" class="sr-only">Meal choice</label>
+              <input id="rsvp-meal-choice" class="form-input" name="meal_choice" placeholder="Meal choice (optional)" />
+              <label for="rsvp-notes" class="sr-only">Guest notes</label>
+              <input id="rsvp-notes" class="form-input" name="notes" placeholder="Notes (optional)" />
+            </div>
+            <button type="submit" class="px-4 py-2 rounded-full bg-bbb-teal text-white text-sm font-semibold">Add RSVP Guest</button>
+          </form>
+
+          <div class="space-y-2 max-h-[22rem] overflow-auto pr-1">
+            {% for guest in rsvp_guests %}
+            <form method="POST" action="{{ url_for('client.plan') }}" class="border border-bbb-sand rounded-xl p-3 bg-white grid grid-cols-1 xl:grid-cols-[1.2fr_auto_auto_auto_auto] gap-2 items-center">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="action" value="update-rsvp-guest" />
+              <input type="hidden" name="guest_id" value="{{ guest.id }}" />
+              <div>
+                <p class="font-semibold text-bbb-navy text-sm">{{ guest.full_name }}</p>
+                <p class="text-xs text-gray-500">{{ guest.group_label or 'No group' }}{% if guest.email %} • {{ guest.email }}{% endif %}</p>
+              </div>
+              <select class="form-input text-sm" name="status">
+                {% for key, label in rsvp_status_options %}
+                <option value="{{ key }}" {% if guest.status == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <input class="form-input text-sm" name="meal_choice" placeholder="Meal" value="{{ guest.meal_choice or '' }}" />
+              <input class="form-input text-sm" name="table_name" placeholder="Table" value="{{ guest.table_name or '' }}" />
+              <div class="flex gap-2">
+                <button type="submit" class="px-3 py-2 rounded-full bg-bbb-navy text-white text-xs font-semibold">Save</button>
+              </div>
+            </form>
+            <form method="POST" action="{{ url_for('client.plan') }}" class="-mt-1 mb-2 text-right">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="action" value="delete-rsvp-guest" />
+              <input type="hidden" name="guest_id" value="{{ guest.id }}" />
+              <button type="submit" class="text-xs text-rose-600 hover:text-rose-700">Remove guest</button>
+            </form>
+            {% else %}
+            <p class="text-sm text-gray-500">No RSVP guests yet. Add your first guest above.</p>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h2 class="font-serif text-2xl text-bbb-navy mb-4">Recently Completed</h2>
+          <div class="space-y-2 text-sm">
+            {% for task in completed_recent %}
+            <div class="border border-bbb-sand rounded-lg px-3 py-2 flex items-center justify-between">
+              <span class="text-gray-700">{{ task.title }}</span>
+              <span class="text-xs text-green-700 font-semibold">Done</span>
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500">Completed tasks will appear here.</p>
+            {% endfor %}
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% block title %}Contacts{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Contact Submissions</h1>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('admin.export_contacts_csv') }}" class="px-4 py-2 text-sm rounded-full border border-bbb-teal text-bbb-teal">Export CSV</a>
+    <a href="{{ url_for('admin.contacts', source='portal') }}" class="px-4 py-2 text-sm rounded-full {% if source == 'portal' %}bg-bbb-navy text-white{% else %}bg-bbb-teal text-white{% endif %}">Portal Messages</a>
+    <a href="{{ url_for('admin.contacts', unread=1) }}" class="px-4 py-2 text-sm rounded-full {% if unread %}bg-bbb-navy text-white{% else %}bg-bbb-teal text-white{% endif %}">Unread Only</a>
+    <a href="{{ url_for('admin.contacts') }}" class="px-4 py-2 text-sm rounded-full border border-gray-300">Clear</a>
+  </div>
+</div>
+
+<form method="GET" class="mb-4">
+  {% if unread %}<input type="hidden" name="unread" value="1" />{% endif %}
+  {% if source %}<input type="hidden" name="source" value="{{ source }}" />{% endif %}
+  <div class="flex gap-3 max-w-2xl">
+    <label for="contacts-search" class="sr-only">Search contacts</label>
+    <input id="contacts-search" type="text" name="q" value="{{ q }}" placeholder="Search name, email, subject" class="form-input max-w-lg" />
+    <button class="px-4 py-2 text-sm rounded-full bg-bbb-teal text-white">Search</button>
+  </div>
+</form>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Name</th>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3">Subject / Type</th>
+        <th class="px-4 py-3">Services</th>
+        <th class="px-4 py-3">Board</th>
+        <th class="px-4 py-3">Submitted</th>
+        <th class="px-4 py-3">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in submissions.items %}
+      <tr class="border-t border-gray-100">
+        <td class="px-4 py-3"><a class="text-bbb-teal" href="{{ url_for('admin.contact_detail', id=item.id) }}">{{ item.name }}</a></td>
+        <td class="px-4 py-3">{{ item.email }}</td>
+        <td class="px-4 py-3">{{ item.subject or "-" }}</td>
+        <td class="px-4 py-3">{{ item.services_interested or "-" }}</td>
+        <td class="px-4 py-3">
+          {% if board_links.get(item.id) %}
+          <a class="text-bbb-teal font-semibold" href="{{ url_for('admin.inspiration_board_detail', id=board_links.get(item.id)) }}">Open</a>
+          {% else %}
+          -
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">{{ item.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td class="px-4 py-3">{{ "Unread" if not item.is_read else "Read" }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="px-4 py-6 text-gray-500" colspan="7">No contact submissions yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if submissions.pages > 1 %}
+<div class="flex items-center gap-2 mt-4">
+  {% for p in range(1, submissions.pages + 1) %}
+  <a class="px-3 py-1 rounded border text-sm {% if p == submissions.page %}bg-bbb-navy text-white border-bbb-navy{% else %}bg-white border-gray-300{% endif %}"
+     href="{{ url_for('admin.contacts', page=p, unread=1 if unread else None, source=source or None, q=q or None) }}">{{ p }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

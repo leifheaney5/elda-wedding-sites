@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Services{% endblock %}
+{% block meta_desc %}Explore wedding services from ELDA Wedding Sites including lookbook inspiration, florals, catering, and guest experience recommendations.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Services Hub" %}
+{% set hero_title = "Wedding Services" %}
+{% set hero_subtitle = "Everything beyond the ceremony: lookbook inspiration, florals, menus, and guest experience planning." %}
+{% set hero_bg = url_for('static', filename='images/venue/reception.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-serif text-3xl text-bbb-navy">Service Overview</h2>
+      <a href="{{ url_for('booking.service_request', request_type='catering') }}" class="mobile-cta-link">Start a Service Request</a>
+    </div>
+    <div class="relative">
+      <div id="services-carousel" class="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-2">
+        {% set cards = [
+          ("Wedding Lookbook", "Browse styled inspiration and aesthetics for your day.", url_for('main.lookbook'), "images/gallery/portfolio-1.jpg"),
+          ("ELDA Florals", "Bouquets, ceremony florals, centerpieces, and full styling.", url_for('florals.florals'), "images/florals/floral-feature.jpg"),
+          ("Catering Menus", "Compare generalized menu option sets and service formats.", url_for('catering.catering'), "images/venue/intimate-dinner.jpg"),
+          ("Nearby Attractions", "Share local experiences with your guests in your area.", url_for('main.nearby_attractions'), "images/gallery/portfolio-2.jpg"),
+        ] %}
+        {% for title, desc, link, image in cards %}
+        <a href="{{ link }}" class="snap-start shrink-0 w-[84vw] sm:w-[48%] lg:w-[32%] bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <img src="{{ url_for('static', filename=image) }}" alt="{{ title }}" class="h-44 w-full object-cover" />
+          <div class="p-5">
+            <h3 class="font-serif text-2xl text-bbb-navy mb-2">{{ title }}</h3>
+            <p class="text-sm text-gray-600">{{ desc }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <p class="font-script text-3xl text-bbb-teal mb-2">At A Glance</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Services Comparison</h2>
+    </div>
+    <p class="comparison-swipe-hint md:hidden">Swipe horizontally to compare service categories.</p>
+    <div class="comparison-scroll-wrap rounded-2xl border border-bbb-sand bg-white shadow-sm">
+      <table class="comparison-table min-w-full text-sm">
+        <thead>
+          <tr class="bg-bbb-cream">
+            <th class="px-4 py-3 text-left font-semibold text-bbb-navy">Feature</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Lookbook</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Florals</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Catering</th>
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">Nearby Attractions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set rows = [
+            ("Planning-ready recommendations", [1,1,1,1]),
+            ("Visual inspiration support", [1,1,0,0]),
+            ("Direct booking/request path", [0,1,1,0]),
+            ("Custom quote/service scope", [0,1,1,0]),
+            ("Guest-experience enhancement", [0,1,1,1]),
+          ] %}
+          {% for feature, vals in rows %}
+          <tr class="border-t border-bbb-sand/70">
+            <td class="px-4 py-3 font-medium text-gray-700">{{ feature }}</td>
+            {% for v in vals %}
+            <td class="px-4 py-3 text-center">
+              {% if v %}
+              <span class="inline-flex w-7 h-7 items-center justify-center rounded-full bg-green-100 text-green-700 border border-green-300 font-bold">✓</span>
+              {% else %}
+              <span class="inline-flex w-7 h-7 items-center justify-center rounded-full bg-rose-100 text-rose-700 border border-rose-300 font-bold">✕</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

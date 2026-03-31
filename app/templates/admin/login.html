@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | ELDA Wedding Sites</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.generated.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+</head>
+<body class="bg-bbb-cream min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
+    <h1 class="font-serif text-3xl text-bbb-navy mb-2">Admin Login</h1>
+    <p class="text-sm text-gray-500 mb-6">Sign in to manage leads and bookings.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="space-y-2 mb-4">
+      {% for category, message in messages %}
+      <div class="rounded-lg px-4 py-3 text-sm {% if category == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <form method="POST" class="space-y-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div>
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" id="email" name="email" type="email" required />
+      </div>
+      <div>
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" id="password" name="password" type="password" required />
+      </div>
+      <label class="inline-flex items-center text-sm gap-2 text-gray-600">
+        <input type="checkbox" name="remember" />
+        Remember me
+      </label>
+      <button type="submit" class="w-full px-6 py-3 bg-bbb-teal text-white rounded-full hover:bg-bbb-teal-dark transition-colors">
+        Log In
+      </button>
+    </form>
+  </div>
+</body>
+</html>

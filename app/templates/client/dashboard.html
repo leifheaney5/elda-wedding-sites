@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Client Portal{% endblock %}
+{% block content %}
+{% set hero_script_line = "Private Concierge Portal" %}
+{% set hero_title = "Welcome, " ~ (current_user.full_name or "Client") %}
+{% set hero_subtitle = "Your wedding details, progress, and communication history in one elegant workspace." %}
+{% include 'components/hero.html' %}
+{% include 'components/client_portal_tabs.html' %}
+
+<section class="py-12 bg-gradient-to-b from-bbb-cream via-[#fbf9f7] to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <article class="rounded-3xl border border-bbb-sand bg-white p-6 shadow-sm">
+      <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.2em] text-bbb-teal font-semibold mb-2">Concierge Snapshot</p>
+          <h2 class="font-serif text-3xl text-bbb-navy mb-2">Planning Progress: {{ progress_percent }}%</h2>
+          <p class="text-sm text-gray-600 mb-4">You have completed {{ completed_tasks }} of {{ total_tasks }} tasks. Keep momentum by handling your next priority below.</p>
+          <div class="w-full h-3 rounded-full bg-bbb-cream overflow-hidden mb-4">
+            <div class="h-full bg-gradient-to-r from-bbb-teal to-bbb-navy" style="width: {{ progress_percent }}%"></div>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <a href="{{ url_for('client.plan') }}" class="px-5 py-2.5 rounded-full bg-bbb-navy text-white text-sm font-semibold hover:bg-bbb-teal">Open Wedding Plan</a>
+            <a href="{{ url_for('client.inspiration') }}" class="px-5 py-2.5 rounded-full border-2 border-bbb-teal text-bbb-teal text-sm font-semibold hover:bg-bbb-teal hover:text-white">Update Inspiration Board</a>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-bbb-sand bg-bbb-cream/60 p-4">
+          <p class="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold mb-2">Action Queue</p>
+          <p class="font-serif text-3xl text-bbb-navy mb-2">{{ action_queue_count }}</p>
+          <div class="space-y-2 text-sm text-gray-700">
+            <p>Open service requests: <strong>{{ open_service_requests }}</strong></p>
+            <p>Pending payments: <strong>${{ '%.2f'|format(total_pending_cents / 100) }}</strong></p>
+            {% if next_task %}
+            <p>Next task due: <strong>{{ next_task.due_date }}</strong></p>
+            {% else %}
+            <p>Next task due: <strong>Set in Wedding Plan</strong></p>
+            {% endif %}
+          </div>
+          {% if next_event %}
+          <div class="mt-3 border border-bbb-sand rounded-xl p-3 bg-white">
+            <p class="text-xs uppercase text-gray-500">Upcoming Event</p>
+            <p class="font-semibold text-bbb-navy">{{ next_event.label }}</p>
+            <p class="text-sm text-gray-600">{{ next_event.detail }} • {{ next_event.date }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Bookings</p>
+        <p class="font-serif text-3xl text-bbb-navy">{{ bookings|length }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Service Requests</p>
+        <p class="font-serif text-3xl text-bbb-navy">{{ service_requests|length }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Paid</p>
+        <p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(total_paid_cents / 100) }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Pending</p>
+        <p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(total_pending_cents / 100) }}</p>
+      </article>
+      <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Needs Attention</p>
+        <p class="font-serif text-3xl text-bbb-navy">${{ '%.2f'|format(total_failed_cents / 100) }}</p>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6">
+      <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif text-2xl text-bbb-navy">Upcoming Timeline</h2>
+          <a href="{{ url_for('client.plan') }}" class="text-sm text-bbb-teal font-semibold">See full plan</a>
+        </div>
+        <div class="space-y-3 max-h-[28rem] overflow-auto pr-1">
+          {% for item in upcoming_events %}
+          <div class="border border-bbb-sand rounded-xl p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.label }}</p>
+            <p class="font-semibold text-bbb-navy">{{ item.detail }}</p>
+            <p class="text-sm text-gray-600">{{ item.date }}</p>
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">No future events yet. Add a booking or service request with an event date.</p>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 class="font-serif text-2xl text-bbb-navy mb-4">Finance Snapshot</h2>
+        <div class="space-y-3 max-h-[28rem] overflow-auto pr-1">
+          {% for payment in payments %}
+          <div class="border border-bbb-sand rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p class="font-semibold text-bbb-navy">${{ '%.2f'|format(payment.amount_cents / 100) }}</p>
+              <p class="text-xs text-gray-500">{{ payment.description or "Wedding payment" }}</p>
+            </div>
+            <span class="text-xs uppercase tracking-wide {% if payment.status == 'paid' %}text-green-700{% elif payment.status == 'pending' %}text-amber-700{% else %}text-rose-700{% endif %}">
+              {{ payment.status }}
+            </span>
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">No payment records yet.</p>
+          {% endfor %}
+        </div>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 class="font-serif text-2xl text-bbb-navy mb-4">Your Selections</h2>
+        <div class="space-y-3 max-h-[26rem] overflow-auto pr-1">
+          {% for item in plan_selections %}
+          <div class="border border-bbb-sand rounded-xl p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.category }}</p>
+            <p class="font-semibold text-bbb-navy">{{ item.name|replace('_', ' ')|title }}</p>
+            <p class="text-sm text-gray-600">Status: {{ item.status }}{% if item.date %} • Date: {{ item.date }}{% endif %}</p>
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">No selections yet. Submit a booking request to start planning.</p>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif text-2xl text-bbb-navy">Communications</h2>
+          <a href="{{ url_for('client.messages') }}" class="text-sm text-bbb-teal font-semibold">Send Message</a>
+        </div>
+        <div class="space-y-3 max-h-[26rem] overflow-auto pr-1">
+          {% for item in communications %}
+          <div class="border border-bbb-sand rounded-xl p-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.channel }}</p>
+            <p class="font-semibold text-bbb-navy">{{ item.subject }}</p>
+            <p class="text-sm text-gray-700">{{ item.message }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ item.date.strftime('%Y-%m-%d %H:%M') if item.date else '' }}</p>
+          </div>
+          {% else %}
+          <p class="text-sm text-gray-500">No communication records yet.</p>
+          {% endfor %}
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+{% endblock %}

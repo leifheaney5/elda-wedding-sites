@@ -1,0 +1,86 @@
+{% extends "admin/base.html" %}
+{% block title %}Site Manager{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Site Manager</h1>
+  <p class="text-sm text-gray-500">Post and manage public header announcements.</p>
+</div>
+
+<section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+  <h2 class="font-serif text-2xl text-bbb-navy mb-4">New Announcement</h2>
+  <form method="POST" action="{{ url_for('admin.create_site_announcement') }}" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+      <input name="title" required class="w-full rounded-lg border border-gray-300 px-3 py-2" maxlength="140" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+      <textarea name="message" required rows="3" class="w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Starts (optional)</label>
+        <input type="datetime-local" name="starts_at" class="w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Ends (optional)</label>
+        <input type="datetime-local" name="ends_at" class="w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+    </div>
+    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+      <input type="checkbox" name="is_active" checked />
+      Active now
+    </label>
+    <div>
+      <button class="px-5 py-2 rounded-full bg-bbb-teal text-white">Post Announcement</button>
+    </div>
+  </form>
+</section>
+
+<section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-bbb-cream text-left">
+      <tr>
+        <th class="px-4 py-3">Title</th>
+        <th class="px-4 py-3">Window</th>
+        <th class="px-4 py-3">Status</th>
+        <th class="px-4 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in announcements %}
+      <tr class="border-t border-gray-100 align-top">
+        <td class="px-4 py-3">
+          <p class="font-semibold text-bbb-navy">{{ item.title }}</p>
+          <p class="text-gray-600 mt-1">{{ item.message }}</p>
+        </td>
+        <td class="px-4 py-3 text-gray-600">
+          <div>{{ item.starts_at.strftime('%Y-%m-%d %H:%M') if item.starts_at else 'Immediate' }}</div>
+          <div>{{ item.ends_at.strftime('%Y-%m-%d %H:%M') if item.ends_at else 'No end' }}</div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-1 rounded-full text-xs {{ 'bg-green-100 text-green-700' if item.is_active else 'bg-gray-100 text-gray-600' }}">
+            {{ 'Active' if item.is_active else 'Paused' }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+          <form method="POST" action="{{ url_for('admin.toggle_site_announcement', id=item.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="text-bbb-teal" data-confirm="Toggle this announcement?">Toggle</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.delete_site_announcement', id=item.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="text-red-600" data-confirm="Delete this announcement?">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4" class="px-4 py-6 text-center text-gray-500">No announcements posted yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

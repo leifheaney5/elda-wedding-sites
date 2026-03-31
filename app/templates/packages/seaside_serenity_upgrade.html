@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Ceremony Package F{% endblock %}
+{% block content %}
+{% set hero_script_line = "Featured Package" %}
+{% set hero_title = "Ceremony Package F" %}
+{% set hero_subtitle = "Template enhanced ceremony package." %}
+{% set hero_bg = url_for('static', filename='images/packages/ocean-city.png') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-4">Package Snapshot</h2>
+      <p class="text-gray-700 leading-relaxed mb-4">
+        An upgraded ceremony package with added styling and coordination support for a more tailored wedding day.
+      </p>
+      <a href="{{ url_for('booking.service_request', request_type='package') }}?service=package-f" class="px-8 py-3 bg-bbb-teal text-white rounded-full font-semibold">Request This Package</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

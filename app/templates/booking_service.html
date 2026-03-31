@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ config.title }}{% endblock %}
+{% block content %}
+{% set hero_script_line = "Service Intake" %}
+{% set hero_title = config.heading %}
+{% set hero_subtitle = config.subtitle %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-2">{{ config.heading }}</h2>
+      <p class="text-sm text-gray-500 mb-8">This request is stored separately by service type for easier internal tracking.</p>
+      <form method="POST" action="{{ url_for('booking.service_request', request_type=request_type) }}" class="space-y-5">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="name">Name <span class="text-bbb-coral">*</span></label>
+            <input class="form-input" id="name" name="name" type="text" value="{{ form_data.name if form_data else '' }}" required />
+          </div>
+          <div>
+            <label class="form-label" for="email">Email <span class="text-bbb-coral">*</span></label>
+            <input class="form-input" id="email" name="email" type="email" value="{{ form_data.email if form_data else '' }}" required />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="phone">Phone</label>
+            <input class="form-input" id="phone" name="phone" type="tel" value="{{ form_data.phone if form_data else '' }}" />
+          </div>
+          <div>
+            <label class="form-label" for="event_date">Preferred Date</label>
+            <input class="form-input" id="event_date" name="event_date" type="date" value="{{ form_data.event_date if form_data else '' }}" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="form-label" for="selected_service">Service</label>
+            <select class="form-input" id="selected_service" name="selected_service">
+              <option value="">Select an option</option>
+              {% for value, label in config.choices %}
+              <option value="{{ value }}" {% if selected_service == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="guest_count">Guest Count</label>
+            <input class="form-input" id="guest_count" name="guest_count" type="number" min="0" value="{{ form_data.guest_count if form_data else '' }}" />
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="details">Details</label>
+          <textarea class="form-input resize-none" id="details" name="details" rows="4" placeholder="Tell us your preferences, must-haves, and questions.">{{ form_data.details if form_data else '' }}</textarea>
+        </div>
+        <button type="submit" class="w-full sm:w-auto px-10 py-3.5 bg-bbb-teal hover:bg-bbb-teal-dark text-white font-semibold rounded-full transition-colors shadow-md">
+          Submit Request
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

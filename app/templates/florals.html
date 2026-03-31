@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}ELDA Florals{% endblock %}
+{% block meta_desc %}Browse wedding floral services including bouquets, ceremony arches, centerpieces, and full styling design by ELDA Florals.{% endblock %}
+{% block content %}
+{% set hero_script_line = "ELDA Florals" %}
+{% set hero_title = "Florals &amp; Styled Details" %}
+{% set hero_subtitle = "From soft neutrals to vibrant statement pieces, our floral styling is curated for your ceremony and reception flow." %}
+{% set hero_cta_label = "Request Floral Styling" %}
+{% set hero_cta_url = url_for('booking.service_request', request_type='florals') %}
+{% set hero_bg = url_for('static', filename='images/florals/floral-feature.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <div class="bg-white rounded-3xl p-8 shadow-sm">
+        <p class="font-script text-3xl text-bbb-teal mb-3">What We Provide</p>
+        <div class="w-16 h-0.5 bg-bbb-gold mb-6"></div>
+        <ul class="space-y-3 text-sm text-gray-600">
+          {% set floral_services = [
+            "Bridal bouquets and boutonnieres",
+            "Ceremony arch floral accents",
+            "Reception centerpieces and table styling",
+            "Fresh or high-quality artificial florals",
+            "Setup, breakdown, and design coordination"
+          ] %}
+          {% for service in floral_services %}
+          <li class="flex items-start gap-3">
+            <span class="mt-1 h-2 w-2 rounded-full bg-bbb-teal"></span>
+            <span>{{ service }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="rounded-3xl overflow-hidden bg-bbb-sand p-6 shadow-sm">
+        <img src="{{ url_for('static', filename='images/florals/floral-feature.jpg') }}" alt="ELDA florals and ceremony styling" class="w-full h-56 object-cover rounded-2xl mb-6" />
+        <h3 class="font-serif text-2xl text-bbb-navy mb-4">Style Direction</h3>
+        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+          Your attached reference photos lean into soft neutrals, natural textures, greenery, candlelight,
+          and light blush accents. We apply that palette consistently across ceremony and reception details.
+        </p>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          Ask about full floral bundles that align with package workflows so nothing gets lost between
+          booking, design, and setup day.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <p class="font-script text-3xl text-bbb-teal mb-2">Floral Options</p>
+      <h2 class="font-serif text-4xl font-bold text-bbb-navy">Florals Comparison</h2>
+      <div class="mt-4 w-16 h-0.5 bg-bbb-gold mx-auto"></div>
+    </div>
+    <p class="comparison-swipe-hint md:hidden">Swipe horizontally to compare floral options.</p>
+    <div class="comparison-scroll-wrap rounded-2xl border border-bbb-sand bg-white shadow-sm">
+      {% set cols = ["Bouquets & Boutonnieres", "Ceremony Florals", "Reception Centerpieces", "Full Styling"] %}
+      {% set features = [
+        ("Price", ["Custom quote", "Custom quote", "Custom quote", "Custom quote"]),
+        ("Personal flowers included", [1,1,0,1]),
+        ("Ceremony arch florals", [0,1,0,1]),
+        ("Reception table design", [0,0,1,1]),
+        ("Color palette planning", [1,1,1,1]),
+        ("Setup and breakdown", [0,1,1,1]),
+        ("Best for all-day cohesion", [0,0,0,1]),
+      ] %}
+      <table class="comparison-table min-w-full text-sm">
+        <thead>
+          <tr class="bg-bbb-cream">
+            <th class="px-4 py-3 text-left font-semibold text-bbb-navy">Features</th>
+            {% for c in cols %}
+            <th class="px-4 py-3 text-center font-semibold text-bbb-navy">{{ c }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for feature, vals in features %}
+          <tr class="border-t border-bbb-sand/70">
+            <td class="px-4 py-3 font-medium text-gray-700">{{ feature }}</td>
+            {% for v in vals %}
+            <td class="px-4 py-3 text-center">
+              {% if v is number %}
+                {% if v %}
+                <span class="inline-flex w-7 h-7 items-center justify-center rounded-full bg-green-100 text-green-700 border border-green-300 font-bold">✓</span>
+                {% else %}
+                <span class="inline-flex w-7 h-7 items-center justify-center rounded-full bg-rose-100 text-rose-700 border border-rose-300 font-bold">✕</span>
+                {% endif %}
+              {% elif v %}
+              <span class="text-xs font-semibold text-bbb-navy">{{ v }}</span>
+              {% else %}
+              <span class="text-xs text-gray-500">-</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% set cta_script = "Design your day" %}
+{% set cta_heading = "Need a Floral Concept for Your Package?" %}
+{% set cta_sub = "Share your mood, colors, and guest count. We will build a floral direction that fits your ceremony and venue plan." %}
+{% set cta_label = "Contact Floral Team" %}
+{% set cta_url = url_for('booking.service_request', request_type='florals') %}
+{% include 'components/cta_banner.html' %}
+{% endblock %}

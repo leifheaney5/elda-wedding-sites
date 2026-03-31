@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Sales Lead{% endblock %}
+{% block content %}
+{% set hero_script_line = "Lead Intake" %}
+{% set hero_title = "Sales Lead Form" %}
+{% set hero_subtitle = "Capture core details for new wedding planning inquiries." %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <article class="bg-white rounded-3xl p-8 shadow-sm border border-bbb-sand">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-6">New Lead</h2>
+      <form method="POST" action="{{ url_for('contact.sales_lead') }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="grid sm:grid-cols-2 gap-4">
+          <input type="text" name="name" placeholder="Full Name *" class="px-4 py-3 border rounded-xl" required />
+          <input type="email" name="email" placeholder="Email *" class="px-4 py-3 border rounded-xl" required />
+          <input type="tel" name="phone" placeholder="Phone Number" class="px-4 py-3 border rounded-xl" />
+          <input type="date" name="event_date" class="px-4 py-3 border rounded-xl" />
+          <input type="text" name="event_type" placeholder="Event Type" class="px-4 py-3 border rounded-xl" />
+          <input type="number" name="guest_count" min="1" placeholder="Guest Count" class="px-4 py-3 border rounded-xl" />
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <input type="text" name="budget_range" placeholder="Budget Range" class="px-4 py-3 border rounded-xl" />
+          <input type="text" name="referral_source" placeholder="Referral Source" class="px-4 py-3 border rounded-xl" />
+        </div>
+        <textarea name="notes" rows="5" placeholder="Notes..." class="w-full px-4 py-3 border rounded-xl"></textarea>
+        <button type="submit" class="px-6 py-3 rounded-full bg-bbb-teal text-white font-semibold hover:bg-bbb-teal-dark">
+          Submit Lead
+        </button>
+      </form>
+    </article>
+  </div>
+</section>
+{% endblock %}

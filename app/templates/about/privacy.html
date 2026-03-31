@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy{% endblock %}
+{% block content %}
+{% set hero_script_line = "Privacy" %}
+{% set hero_title = "Website Privacy Policy" %}
+{% set hero_subtitle = "How we collect and use contact and booking information submitted through this website." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-3xl p-8 shadow-sm space-y-5 text-sm leading-relaxed text-gray-600">
+    <p>We collect information you submit through website contact and booking forms to communicate with you about requested services.</p>
+    <p>Submitted data may include names, email addresses, phone numbers, event preferences, and scheduling details.</p>
+    <p>We do not sell personal data. Information is used only for client service, planning communication, and related operations.</p>
+    <p>If you need your submission updated or removed, contact us at <a class="text-bbb-teal" href="mailto:info@eldaweddingsites.com">info@eldaweddingsites.com</a>.</p>
+  </div>
+</section>
+{% endblock %}

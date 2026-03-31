@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Ceremony Package H{% endblock %}
+{% block content %}
+{% set hero_script_line = "Featured Package" %}
+{% set hero_title = "Ceremony Package H" %}
+{% set hero_subtitle = "Template reception-focused package with full coordination support." %}
+{% set hero_bg = url_for('static', filename='images/venue/reception.jpg') %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-3xl p-8 shadow-sm">
+      <h2 class="font-serif text-3xl text-bbb-navy mb-4">Included Service Areas</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+        <p>• Ceremony setup with seating and focal decor</p>
+        <p>• Design style option set</p>
+        <p>• Licensed officiant</p>
+        <p>• Ceremony timeline and full coordination</p>
+        <p>• Marriage license filing support</p>
+        <p>• Reception planning and design finalization</p>
+        <p>• Vendor booking and communication support</p>
+        <p>• Invoice/payment coordination with vendors</p>
+        <p>• Final floor plan creation</p>
+        <p>• Reception order-of-events facilitation</p>
+        <p>• Catering coordination support</p>
+        <p>• Reception entertainment facilitation</p>
+        <p>• Floral add-ons and color palette options</p>
+      </div>
+      <a href="{{ url_for('booking.service_request', request_type='package') }}?service=package-h" class="px-8 py-3 bg-bbb-teal text-white rounded-full font-semibold">Request This Package</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

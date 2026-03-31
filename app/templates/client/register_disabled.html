@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Registration Unavailable{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block content %}
+{% set hero_script_line = "Client Portal" %}
+{% set hero_title = "Registration Is Invite-Only" %}
+{% set hero_subtitle = "Please contact your planner to activate your client portal account." %}
+{% include 'components/hero.html' %}
+
+<section class="py-16 bg-gradient-to-b from-bbb-cream via-[#faf8f5] to-white">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <article class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center">
+      <p class="text-sm text-gray-600 mb-6">
+        New client accounts are created by invitation only to protect private portal access.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="{{ url_for('client.login') }}" class="px-6 py-3 bg-bbb-teal text-white rounded-full font-semibold">Client Login</a>
+        <a href="{{ url_for('contact.contact') }}" class="px-6 py-3 border-2 border-bbb-teal text-bbb-teal rounded-full font-semibold">Contact Planner</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

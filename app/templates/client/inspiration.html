@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}Wedding Inspo{% endblock %}
+{% block content %}
+{% set hero_script_line = "Private Concierge Portal" %}
+{% set hero_title = "Wedding Inspiration Studio" %}
+{% set hero_subtitle = "Curate your colors, themes, and florals like a private luxury mood board." %}
+{% include 'components/hero.html' %}
+{% include 'components/client_portal_tabs.html' %}
+
+<section id="inspo-shell" class="py-12 bg-gradient-to-b from-bbb-cream via-[#f9f6f3] to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-8">
+    <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="font-serif text-2xl text-bbb-navy">Visual Direction</h2>
+        <span class="text-xs uppercase tracking-[0.2em] text-gray-500">Mood presets</span>
+      </div>
+
+      <div class="mb-5 flex flex-wrap gap-2">
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+              data-theme="Elegant Modern" data-color="Powder Blue + Ivory" data-floral="White Roses + Eucalyptus"
+                data-shell="from-[#eff4f7] via-[#f8f6f2] to-white">
+            Elegant Modern
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+              data-theme="Boho Garden" data-color="Terracotta + Beige" data-floral="Neutral Dried Florals"
+                data-shell="from-[#f1e5d8] via-[#f5ede3] to-white">
+            Boho Garden
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+                data-theme="Classic Romantic" data-color="Soft Blush + Sand" data-floral="Hydrangea + Rose Mix"
+                data-shell="from-[#f2e8e8] via-[#f9f4f1] to-white">
+          Classic Romantic
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+                data-theme="Modern Editorial" data-color="Black Tie Neutrals" data-floral="Classic White Orchid Arch"
+                data-shell="from-[#eceff3] via-[#f6f7f9] to-white">
+          Modern Editorial
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+                data-theme="Whimsical Garden" data-color="Lavender + Linen" data-floral="Romantic Blush Garden Mix"
+                data-shell="from-[#efe8f2] via-[#f8f3f7] to-white">
+          Whimsical Garden
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+                data-theme="Timeless Black Tie" data-color="Navy + Gold" data-floral="Cascading Green + White"
+                data-shell="from-[#e5e8ef] via-[#f5f2eb] to-white">
+          Timeless Black Tie
+        </button>
+        <button type="button" class="mood-preset px-3 py-1.5 rounded-full text-xs font-semibold bg-bbb-cream text-bbb-navy border border-bbb-sand"
+              data-theme="Old Money Classic" data-color="Slate Blue + Driftwood" data-floral="Blue Hydrangea + Rose"
+                data-shell="from-[#e6efef] via-[#f5f4ef] to-white">
+            Old Money Classic
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {% set inspo_images = [
+          'images/gallery/portfolio-1.jpg',
+          'images/gallery/portfolio-2.jpg',
+          'images/gallery/elopement-oceanside.jpg',
+          'images/venue/reception.jpg',
+          'images/florals/floral-feature.jpg',
+          'images/venue/intimate-dinner.jpg',
+          'images/packages/package-a.jpg',
+          'images/packages/package-b.jpg',
+          'images/packages/package-c.jpg',
+          'images/packages/package-c.jpg',
+          'images/hero/home-hero.jpg',
+          'images/venue/coastal59-room.jpg'
+        ] %}
+        {% for image in inspo_images %}
+        <div class="rounded-xl overflow-hidden aspect-[4/3] bg-bbb-sand group">
+          <img src="{{ url_for('static', filename=image) }}" alt="Wedding inspiration sample"
+               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="rounded-xl p-3 bg-gradient-to-br from-[#d8e5ef] to-[#f5f2ea] text-xs text-bbb-navy font-semibold">Powder Blue + Ivory</div>
+        <div class="rounded-xl p-3 bg-gradient-to-br from-[#eadfdf] to-[#e8dfd2] text-xs text-bbb-navy font-semibold">Soft Blush + Sand</div>
+        <div class="rounded-xl p-3 bg-gradient-to-br from-[#e7dcc8] to-[#c8aa8c] text-xs text-bbb-navy font-semibold">Terracotta + Beige</div>
+        <div class="rounded-xl p-3 bg-gradient-to-br from-[#d8dce6] to-[#f1f4f8] text-xs text-bbb-navy font-semibold">Dusty Blue + Silver</div>
+      </div>
+
+      <div class="mt-6 rounded-2xl border border-bbb-sand bg-bbb-cream/50 p-4">
+        <h3 class="font-serif text-xl text-bbb-navy mb-2">Visual Direction Library</h3>
+        <p class="text-sm text-gray-600 mb-3">Tap a direction to quickly apply a cohesive style profile.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          {% set directions = [
+            ("Minimal Modern", "Clean palette, airy florals, simple architecture.", "Minimal Modern", "Pearl + Sage", "Baby's Breath Minimal"),
+            ("Sunset Glam", "Warm metallics and statement florals at golden hour.", "Sunset Glam", "Sunset Coral + Gold", "Peony + Garden Rose"),
+            ("Garden Romantic", "Organic greenery with romantic floral layering.", "Garden Romantic", "Sage + Cream", "Cascading Green + White"),
+            ("Soft Vintage", "Muted tones, classic textures, and timeless details.", "Soft Vintage", "Mauve + Champagne", "Hydrangea + Rose Mix"),
+            ("Tropical Modern", "Architectural greens, modern silhouettes, clean lines.", "Tropical Modern", "Emerald + Ivory", "Tropical Anthurium Feature"),
+            ("Candlelit Intimate", "Low-light romance, neutral textures, and glow.", "Candlelit Intimate", "Rosewood + Cream", "Neutral Dried Florals"),
+          ] %}
+          {% for label, desc, theme, color, floral in directions %}
+          <button type="button"
+                  class="mood-preset text-left rounded-xl border border-bbb-sand bg-white p-3 hover:bg-bbb-cream transition-colors"
+                  data-theme="{{ theme }}"
+                  data-color="{{ color }}"
+                  data-floral="{{ floral }}"
+                  data-shell="from-[#f2efe9] via-[#faf8f4] to-white">
+            <p class="font-semibold text-bbb-navy text-sm">{{ label }}</p>
+            <p class="text-xs text-gray-600 mt-1">{{ desc }}</p>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+    </article>
+
+    <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <h2 class="font-serif text-2xl text-bbb-navy mb-2">Customize Your Board</h2>
+      <p class="text-sm text-gray-600 mb-5">Select all styles you love. Save anytime, then send your board directly to the planning team when ready.</p>
+
+      <form method="POST" action="{{ url_for('client.inspiration') }}" class="space-y-6" id="inspo-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="custom_palette" id="custom_palette" value="{{ initial_custom_palette }}" />
+        <div>
+          <h3 class="font-semibold text-bbb-navy mb-2">Color Palette</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for option in color_options %}
+            <label class="flex items-center gap-2 text-sm text-gray-700 rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40">
+              <input type="checkbox" name="colors" value="{{ option }}" {% if option in selected_colors %}checked{% endif %} />
+              <span>{{ option }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-bbb-sand bg-bbb-cream/40 p-4">
+          <h3 class="font-semibold text-bbb-navy mb-2">Palette Canvas Builder</h3>
+          <p class="text-xs text-gray-600 mb-3">Build your own color combination and send it to your planner.</p>
+          <div class="grid grid-cols-5 sm:grid-cols-7 gap-2 mb-3" id="palette-chip-list">
+            {% set palette_chips = ['#F3EFEA','#E3D7CF','#D2B8A7','#B88D79','#273445','#88A096','#EADCE0','#C7D9E8','#A3B3C8','#F7E6D0','#E6D0C6','#D5C0E2','#B4C7A2','#E9E9E9'] %}
+            {% for hex in palette_chips %}
+            <button type="button" class="palette-chip h-8 rounded-md border border-gray-300" data-hex="{{ hex }}" aria-label="Add palette color {{ hex }}" title="Add palette color {{ hex }}" style="background-color: {{ hex }};"></button>
+            {% endfor %}
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <label for="custom-color-picker" class="sr-only">Custom color picker</label>
+            <input type="color" id="custom-color-picker" value="#88a096" class="h-9 w-12 p-1 border border-gray-300 rounded" />
+            <button type="button" id="add-custom-color" class="px-3 py-2 rounded-full text-xs font-semibold bg-bbb-navy text-white">Add Custom Color</button>
+            <button type="button" id="clear-canvas" class="px-3 py-2 rounded-full text-xs font-semibold border border-gray-300 text-gray-700">Clear</button>
+          </div>
+          <div id="palette-canvas-preview" class="flex gap-1 rounded-lg border border-bbb-sand bg-white p-2 min-h-[46px] items-center flex-wrap"></div>
+          <p class="text-xs text-gray-600 mt-2" id="palette-canvas-label">No custom colors selected yet.</p>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-bbb-navy mb-2">Theme</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for option in theme_options %}
+            <label class="flex items-center gap-2 text-sm text-gray-700 rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40">
+              <input type="checkbox" name="themes" value="{{ option }}" {% if option in selected_themes %}checked{% endif %} />
+              <span>{{ option }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-bbb-navy mb-2">Floral Style</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% for option in floral_options %}
+            <label class="flex items-center gap-2 text-sm text-gray-700 rounded-lg border border-bbb-sand px-3 py-2 bg-bbb-cream/40">
+              <input type="checkbox" name="florals" value="{{ option }}" {% if option in selected_florals %}checked{% endif %} />
+              <span>{{ option }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="notes">Style Notes</label>
+          <textarea class="form-input resize-none" id="notes" name="notes" rows="4" placeholder="Share references, textures, must-have details, or things you want to avoid.">{{ record.notes if record else '' }}</textarea>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button type="submit" name="action" value="save" class="px-6 py-3 rounded-full bg-bbb-teal text-white font-semibold hover:bg-bbb-teal-dark">
+            Save Inspiration
+          </button>
+          <button type="submit" name="action" value="send-admin" class="px-6 py-3 rounded-full border-2 border-bbb-navy text-bbb-navy font-semibold hover:bg-bbb-navy hover:text-white">
+            Send Board to Planner
+          </button>
+        </div>
+      </form>
+    </article>
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  (function () {
+    var presets = document.querySelectorAll('.mood-preset');
+    var shell = document.getElementById('inspo-shell');
+    var customPaletteInput = document.getElementById('custom_palette');
+    var chipButtons = document.querySelectorAll('.palette-chip');
+    var addCustomColorBtn = document.getElementById('add-custom-color');
+    var clearCanvasBtn = document.getElementById('clear-canvas');
+    var colorPicker = document.getElementById('custom-color-picker');
+    var preview = document.getElementById('palette-canvas-preview');
+    var previewLabel = document.getElementById('palette-canvas-label');
+    var selectedPalette = [];
+
+    presets.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var theme = button.dataset.theme;
+        var color = button.dataset.color;
+        var floral = button.dataset.floral;
+
+        document.querySelectorAll('input[name="themes"]').forEach(function (cb) {
+          if (cb.value === theme) cb.checked = true;
+        });
+        document.querySelectorAll('input[name="colors"]').forEach(function (cb) {
+          if (cb.value === color) cb.checked = true;
+        });
+        document.querySelectorAll('input[name="florals"]').forEach(function (cb) {
+          if (cb.value === floral) cb.checked = true;
+        });
+
+        if (shell && button.dataset.shell) {
+          shell.classList.remove('from-bbb-cream', 'via-[#f9f6f3]', 'to-white', 'from-[#eff4f7]', 'via-[#f8f6f2]', 'from-[#f1e5d8]', 'via-[#f5ede3]', 'from-[#f2e8e8]', 'via-[#f9f4f1]');
+          var pieces = button.dataset.shell.split(' ');
+          pieces.forEach(function (piece) { shell.classList.add(piece); });
+        }
+      });
+    });
+
+    function normalizeHex(v) {
+      return (v || '').trim().toUpperCase();
+    }
+
+    function renderPaletteCanvas() {
+      if (!preview || !customPaletteInput || !previewLabel) return;
+      preview.innerHTML = '';
+      if (!selectedPalette.length) {
+        previewLabel.textContent = 'No custom colors selected yet.';
+        customPaletteInput.value = '';
+        return;
+      }
+
+      selectedPalette.forEach(function (hex) {
+        var swatch = document.createElement('div');
+        swatch.className = 'h-8 w-8 rounded border border-gray-300';
+        swatch.style.backgroundColor = hex;
+        swatch.title = hex;
+        preview.appendChild(swatch);
+      });
+      customPaletteInput.value = selectedPalette.join(', ');
+      previewLabel.textContent = 'Custom palette: ' + customPaletteInput.value;
+    }
+
+    function addColor(hex) {
+      var normalized = normalizeHex(hex);
+      if (!normalized || selectedPalette.includes(normalized)) return;
+      selectedPalette.push(normalized);
+      renderPaletteCanvas();
+    }
+
+    chipButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        addColor(btn.dataset.hex);
+      });
+    });
+
+    if (addCustomColorBtn && colorPicker) {
+      addCustomColorBtn.addEventListener('click', function () {
+        addColor(colorPicker.value);
+      });
+    }
+
+    if (clearCanvasBtn) {
+      clearCanvasBtn.addEventListener('click', function () {
+        selectedPalette = [];
+        renderPaletteCanvas();
+      });
+    }
+
+    if (customPaletteInput && customPaletteInput.value) {
+      selectedPalette = customPaletteInput.value.split(',').map(function (v) { return normalizeHex(v); }).filter(Boolean);
+      renderPaletteCanvas();
+    }
+  })();
+</script>
+{% endblock %}

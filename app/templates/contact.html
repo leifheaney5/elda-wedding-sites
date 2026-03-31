@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Contact Us{% endblock %}
+{% block meta_desc %}Contact ELDA Wedding Sites to ask about wedding packages, venue availability, florals, catering, and planning timelines.{% endblock %}
+{% block content %}
+{% set hero_script_line = "Let's Plan Your Day" %}
+{% set hero_title = "Contact ELDA Wedding Sites" %}
+{% set hero_subtitle = "Tell us your vision, preferred date, and package questions. We typically respond within one business day." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm">
+        <h2 class="font-serif text-3xl text-bbb-navy mb-2">Send a Message</h2>
+        <p class="text-sm text-gray-500 mb-8">Fields marked with * are required.</p>
+        {% include 'components/contact_form.html' %}
+      </div>
+      <div class="bg-white rounded-3xl p-8 shadow-sm">
+        <h3 class="font-serif text-2xl text-bbb-navy mb-4">Contact Details</h3>
+        <div class="space-y-4 text-sm text-gray-600">
+          <p><strong class="text-bbb-navy">Phone:</strong><br /><a href="tel:+14436144783" class="mobile-cta-link">(443) 614-4783</a></p>
+          <p><strong class="text-bbb-navy">Email:</strong><br /><a href="mailto:info@eldaweddingsites.com" class="mobile-cta-link">info@eldaweddingsites.com</a></p>
+          <p><strong class="text-bbb-navy">Address:</strong><br />123 Example Avenue Suite 100<br />Example City, ST 00000</p>
+          {% if site_url %}
+          <p><strong class="text-bbb-navy">Website:</strong><br /><a href="{{ site_url }}" class="mobile-cta-link">{{ site_url }}</a></p>
+          {% endif %}
+        </div>
+        <div class="mt-6">
+          <h4 class="font-serif text-xl text-bbb-navy mb-3">Venue Location</h4>
+          <iframe
+            title="Venue Location Map"
+            src="https://www.google.com/maps?q=123+Example+Avenue+Suite+100,+Example+City,+ST+00000&output=embed"
+            class="w-full h-56 rounded-xl border border-bbb-sand"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('main.nearby_attractions') }}" class="mobile-cta-link">Nearby Attractions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

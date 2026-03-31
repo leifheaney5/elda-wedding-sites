@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+{% block title %}Email Campaigns{% endblock %}
+{% block admin_content %}
+<section class="mb-6">
+  <h1 class="font-serif text-4xl text-bbb-navy">Email Campaigns</h1>
+  <p class="text-sm text-gray-500">Manage subscriber broadcasts and send one-click automated updates.</p>
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Active Subscribers</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ summary.active_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Inactive Subscribers</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ summary.inactive_count }}</p>
+  </article>
+  <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500">Never Contacted</p>
+    <p class="font-serif text-3xl text-bbb-navy">{{ summary.never_contacted_count }}</p>
+  </article>
+</section>
+
+<section class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Automated Campaign</h2>
+    <p class="text-sm text-gray-600 mb-4">Sends a styled update email to active subscribers using the configured sender.</p>
+    <p class="text-xs text-gray-500 mb-4">Sender: {{ default_sender }}</p>
+    <form method="POST" action="{{ url_for('admin.email_campaigns') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="send-automated-update" />
+      <button type="submit" class="px-5 py-2 rounded-full bg-bbb-teal text-white font-semibold">Send Automated Update</button>
+    </form>
+  </article>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <h2 class="font-serif text-2xl text-bbb-navy mb-3">Custom Campaign</h2>
+    <form method="POST" action="{{ url_for('admin.email_campaigns') }}" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="send-custom-email" />
+
+      <div>
+        <label for="campaign-subject" class="text-xs uppercase tracking-wide text-gray-500">Subject</label>
+        <input id="campaign-subject" class="form-input mt-1" name="subject" required placeholder="Wedding planning updates" />
+      </div>
+
+      <div>
+        <label for="campaign-body" class="text-xs uppercase tracking-wide text-gray-500">Message</label>
+        <textarea id="campaign-body" class="form-input mt-1 resize-none" rows="6" name="body" required placeholder="Write your campaign message"></textarea>
+      </div>
+
+      <div>
+        <label for="campaign-audience" class="text-xs uppercase tracking-wide text-gray-500">Audience</label>
+        <select id="campaign-audience" class="form-input mt-1" name="audience">
+          <option value="active">All active subscribers</option>
+          <option value="test">Single test recipient</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="campaign-test-email" class="text-xs uppercase tracking-wide text-gray-500">Test Recipient (optional unless test mode)</label>
+        <input id="campaign-test-email" class="form-input mt-1" type="email" name="test_email" placeholder="leif@hawkeyetech.solutions" />
+      </div>
+
+      <button type="submit" class="px-5 py-2 rounded-full bg-bbb-navy text-white font-semibold">Send Custom Email</button>
+    </form>
+  </article>
+</section>
+
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+  <h2 class="font-serif text-2xl text-bbb-navy mb-4">Latest Subscribers</h2>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="text-left text-gray-500 border-b">
+          <th class="py-2 pr-3">Email</th>
+          <th class="py-2 pr-3">Name</th>
+          <th class="py-2 pr-3">Source</th>
+          <th class="py-2 pr-3">Status</th>
+          <th class="py-2 pr-3">Subscribed</th>
+          <th class="py-2">Last Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in subscribers %}
+        <tr class="border-b border-gray-100">
+          <td class="py-2 pr-3 text-bbb-navy">{{ item.email }}</td>
+          <td class="py-2 pr-3">{{ item.name or '-' }}</td>
+          <td class="py-2 pr-3">{{ item.source }}</td>
+          <td class="py-2 pr-3">{{ 'active' if item.is_active else 'inactive' }}</td>
+          <td class="py-2 pr-3">{{ item.subscribed_at.strftime('%Y-%m-%d') if item.subscribed_at else '-' }}</td>
+          <td class="py-2">{{ item.last_email_sent_at.strftime('%Y-%m-%d %H:%M') if item.last_email_sent_at else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td class="py-3 text-gray-500" colspan="6">No subscribers yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

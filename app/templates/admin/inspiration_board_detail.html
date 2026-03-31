@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Inspiration Detail{% endblock %}
+{% block admin_content %}
+<div class="max-w-4xl">
+  <a href="{{ url_for('admin.inspiration_boards') }}" class="text-sm text-bbb-teal font-semibold">&larr; Back to Inspiration Boards</a>
+  <h1 class="font-serif text-4xl text-bbb-navy mt-2 mb-6">Inspiration Board Detail</h1>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+    <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Client</p>
+    <p class="font-semibold text-bbb-navy">{{ board.client.full_name or 'Client User' }}</p>
+    <p class="text-sm text-gray-600">{{ board.client.email }}</p>
+    <p class="text-xs text-gray-500 mt-2">Updated {{ board.updated_at.strftime('%Y-%m-%d %H:%M') if board.updated_at else '-' }}</p>
+  </article>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Colors</p>
+      <p class="text-sm text-gray-800">{{ board.colors or 'None selected' }}</p>
+    </article>
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Themes</p>
+      <p class="text-sm text-gray-800">{{ board.themes or 'None selected' }}</p>
+    </article>
+    <article class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Florals</p>
+      <p class="text-sm text-gray-800">{{ board.florals or 'None selected' }}</p>
+    </article>
+  </div>
+
+  <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Client Notes</p>
+    <p class="text-sm text-gray-800 whitespace-pre-line">{{ board.notes or 'No notes provided.' }}</p>
+  </article>
+</div>
+{% endblock %}

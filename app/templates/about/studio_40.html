@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Studio 40{% endblock %}
+{% block content %}
+{% set hero_script_line = "Studio 40" %}
+{% set hero_title = "Studio 40" %}
+{% set hero_subtitle = "Creative styling support, design concepts, and presentation materials for your event vision." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-3xl p-8 shadow-sm">
+    <p class="text-gray-600 leading-relaxed">
+      Studio 40 is where inspiration, floor-plan concepts, and detailed event styling are organized.
+      This page can be expanded with your internal content and galleries as those assets are finalized.
+    </p>
+  </div>
+</section>
+{% endblock %}

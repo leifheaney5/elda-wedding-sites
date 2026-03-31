@@ -1,0 +1,19 @@
+{#
+  Reusable CTA banner strip.
+  Variables: cta_heading, cta_sub, cta_label, cta_url
+#}
+<section class="bg-bbb-teal py-16">
+  <div class="max-w-4xl mx-auto px-4 text-center text-white">
+    <p class="font-script text-3xl text-bbb-sand mb-2">{{ cta_script | default("Your perfect day awaits") }}</p>
+    <h2 class="font-serif text-3xl sm:text-4xl font-bold mb-4">
+      {{ cta_heading | default("Ready to Start Planning?") }}
+    </h2>
+    <p class="font-sans text-white/85 text-lg mb-8 max-w-2xl mx-auto">
+      {{ cta_sub | default("Let ELDA Wedding Sites take care of every detail so you can focus on what matters most — each other.") }}
+    </p>
+    <a href="{{ cta_url | default('/book') }}"
+       class="inline-block px-10 py-4 bg-white text-bbb-teal hover:bg-bbb-sand font-semibold rounded-full text-base transition-all shadow-lg hover:shadow-xl">
+      {{ cta_label | default("Book Your Wedding") }}
+    </a>
+  </div>
+</section>

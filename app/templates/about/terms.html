@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Terms & Services{% endblock %}
+{% block content %}
+{% set hero_script_line = "Terms" %}
+{% set hero_title = "Terms &amp; Services" %}
+{% set hero_subtitle = "General service terms for ELDA Wedding Sites bookings and planning support." %}
+{% include 'components/hero.html' %}
+
+<section class="py-20 bg-bbb-cream">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-3xl p-8 shadow-sm space-y-5 text-sm leading-relaxed text-gray-600">
+    <p>All services are provided based on signed agreements, selected package scope, and confirmed payment schedules.</p>
+    <p>Dates are not reserved until the required deposit is received and confirmation is issued by our team.</p>
+    <p>Any third-party services (vendor, venue, or platform) are subject to their own policies and service limitations.</p>
+    <p>Final package details, timelines, and obligations are documented in each client agreement.</p>
+  </div>
+</section>
+{% endblock %}
