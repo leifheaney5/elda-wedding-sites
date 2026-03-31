@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Flask / App
+instance/
+*.db
+bbb_dev.db
+bbb_prod.db
+
+# Environment
+.env
+*.env.local
+
+# Migrations (keep migrations/ folder but not __pycache__ inside)
+migrations/__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Node (if Tailwind CLI is used locally)
+node_modules/
+package-lock.json
+
+# Static uploads
+app/static/uploads/

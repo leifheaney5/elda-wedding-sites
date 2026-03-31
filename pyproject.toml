@@ -1,0 +1,34 @@
+[project]
+name = "elda-wedding-sites"
+version = "0.1.0"
+description = "ELDA Wedding Sites Flask website and portals"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask==3.0.3",
+    "Flask-SQLAlchemy==3.1.1",
+    "Flask-Migrate==4.0.7",
+    "Flask-Login==0.6.3",
+    "Flask-Mail==0.10.0",
+    "Flask-WTF==1.2.1",
+    "Flask-Limiter==3.8.0",
+    "WTForms==3.1.2",
+    "Werkzeug==3.1.5",
+    "python-dotenv==1.0.1",
+    "stripe==9.12.0",
+    "email-validator==2.2.0",
+    "Pillow==12.1.1",
+    "gunicorn==22.0.0",
+    "psycopg2-binary==2.9.9",
+    "Authlib==1.6.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0,<9",
+    "beautifulsoup4>=4.12.0,<5",
+    "playwright>=1.51.0,<2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
