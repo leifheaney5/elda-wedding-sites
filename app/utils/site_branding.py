@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import quote
 
+from flask import redirect
 from jinja2 import BaseLoader, TemplateNotFound
 
 
@@ -70,3 +72,40 @@ def install_brand_profile_loader(app) -> None:
     if app.jinja_loader is not None:
         app.jinja_loader = BrandProfileLoader(app.jinja_loader, app.config)
     app.extensions["brand_profile_loader"] = True
+
+
+def install_deployment_asset_origin(app) -> None:
+    """Redirect deployment-owned image requests to an optional external origin.
+
+    Shared CSS and JavaScript continue to come from the canonical application.
+    Only paths under ``/static/images/`` are redirected. This lets a client keep a
+    private/production photo library in its own tiny asset service while the web app
+    runs the shared canonical codebase.
+    """
+
+    if app.extensions.get("deployment_asset_origin"):
+        return
+
+    asset_base_url = str(app.config.get("ASSET_BASE_URL", "")).strip().rstrip("/")
+    if not asset_base_url:
+        app.extensions["deployment_asset_origin"] = False
+        return
+
+    original_static = app.view_functions.get("static")
+    if original_static is None:
+        app.extensions["deployment_asset_origin"] = False
+        return
+
+    def deployment_static(filename: str):
+        if filename.startswith("images/"):
+            safe_filename = quote(filename, safe="/-_.~")
+            return redirect(f"{asset_base_url}/{safe_filename}", code=302)
+        return original_static(filename=filename)
+
+    app.view_functions["static"] = deployment_static
+    app.extensions["deployment_asset_origin"] = True
+
+
+def install_site_profile_runtime(app) -> None:
+    install_brand_profile_loader(app)
+    install_deployment_asset_origin(app)
