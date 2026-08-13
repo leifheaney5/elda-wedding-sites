@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from site_profiles import available_profiles, load_site_profile
 
 
-ROOT = Path(__file__).resolve().parents[1]
 STATIC_ROOT = ROOT / "app" / "static"
 
 
