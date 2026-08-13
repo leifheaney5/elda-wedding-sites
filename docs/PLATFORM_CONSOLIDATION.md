@@ -29,7 +29,8 @@ Railway
 │
 └── client-bbb-wedding (current project: bbb-wedding-website)
     ├── web
-    └── Postgres
+    ├── Postgres
+    └── optional client-owned image asset service
 ```
 
 The Railway project names above are descriptive targets only. Renaming them does
@@ -68,6 +69,24 @@ BRAND_PHONE_URI=+15555550100
 SITE_URL=https://weddings.example.com
 ```
 
+## Client-owned image assets
+
+The canonical repository intentionally does not need to absorb every client's
+private or production photo library. A deployment can set:
+
+```env
+ASSET_BASE_URL=https://assets.example.com/static
+```
+
+When configured, requests under `/static/images/*` are redirected to that client
+asset origin while shared CSS and JavaScript continue to come from the canonical
+application. This keeps the application code consolidated without forcing client
+photography into the core repository.
+
+For Barefoot Beach Brides, this is the preferred cutover path because the current
+BBB repository owns the real production logo and photography while the ELDA/template
+repository contains placeholders in several equivalent image paths.
+
 ## Isolation requirements
 
 The following are always deployment-specific Railway variables or resources:
@@ -80,6 +99,7 @@ The following are always deployment-specific Railway variables or resources:
 - client domains
 - admin/client user records
 - contacts, bookings, payments, service requests, communications, vendors, and files
+- client-owned image/photo libraries when `ASSET_BASE_URL` is used
 
 A new client deployment receives a new Postgres service. Never point two client
 web services at the same production `DATABASE_URL`.
@@ -88,19 +108,31 @@ web services at the same production `DATABASE_URL`.
 
 1. Keep the existing BBB Railway project and database intact as the rollback source.
 2. Finish the reusable profile seam on `platform-consolidation`.
-3. Validate the shared application against a disposable/staging database.
+3. Validate the shared application against a disposable/staging database or an
+   explicitly disposable SQLite staging instance.
 4. Compare the canonical schema/Alembic head with BBB before changing source code.
 5. Point a staging BBB web service at the canonical repository/branch and set
-   `SITE_PROFILE=bbb` plus BBB's existing deployment-specific secrets.
-6. Run migrations only against the staging/target BBB database.
-7. Smoke-test public pages, booking/contact intake, client login, admin login,
+   `SITE_PROFILE=bbb` without pointing it at the production BBB database.
+6. Preserve BBB production photography through a client-owned asset origin before
+   any production source cutover.
+7. Run migrations only against the staging/target BBB database.
+8. Smoke-test public pages, booking/contact intake, client login, admin login,
    payment paths, email generation, and file/attachment handling.
-8. Switch the existing BBB web service source only after the staging checks pass.
-9. Do not move or merge the BBB Postgres data during the source-code cutover unless
-   a schema migration explicitly requires it.
-10. Keep the old BBB repository branch and last successful Railway deployment as
+9. Switch the existing BBB web service source only after the staging checks pass.
+10. Do not move or merge the BBB Postgres data during the source-code cutover unless
+    a schema migration explicitly requires it.
+11. Keep the old BBB repository branch and last successful Railway deployment as
     rollback references until the new deployment has been stable through a full
     operational cycle.
+
+## Staging safety
+
+The production Railway config runs Alembic as a pre-deploy command. Disposable
+SQLite staging must override that pre-deploy command because the repository also
+contains local fallback SQLite fixtures whose pre-existing tables are not a clean
+migration target. The `ALLOW_SQLITE_STAGING=True` startup flag is therefore only
+an explicit boot escape hatch for a disposable parity instance; it must never be
+enabled on an actual client production deployment.
 
 ## Rollback
 
@@ -121,9 +153,10 @@ Rollback is intentionally simple because data remains isolated and in place:
 
 No consolidation work should be force-pushed over production history.
 
-## Current blocker
+## Validation status
 
-GitHub Actions validation is currently unavailable because the account Actions
-billing/spending limit is blocking workflow jobs. Do not merge the consolidation
-branch solely on the basis of an unexecuted workflow. Use local/staging validation
-and re-run CI after Actions is restored.
+GitHub Actions is currently available and the platform CI is green. The suite
+validates both built-in profiles, the shared application contract, and full-app
+ELDA/BBB render smoke checks. A Railway BBB-profile staging service is also used as
+an additional deployment-parity gate before the existing BBB production web source
+is changed.
