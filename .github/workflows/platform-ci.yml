@@ -23,3 +23,13 @@ jobs:
         run: uv run python scripts/validate_site_profile.py
       - name: Run tests
         run: uv run pytest
+      - name: Smoke ELDA profile
+        env:
+          SITE_PROFILE: elda
+          FLASK_ENV: development
+        run: uv run python scripts/smoke_site_profile.py
+      - name: Smoke BBB profile
+        env:
+          SITE_PROFILE: bbb
+          FLASK_ENV: development
+        run: uv run python scripts/smoke_site_profile.py
