@@ -1,9 +1,12 @@
 import os
 from dotenv import load_dotenv
 
+from site_profiles import load_site_profile
+
 load_dotenv()
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+SITE_PROFILE_VALUES = load_site_profile()
 
 
 def _get_database_url() -> str | None:
@@ -67,6 +70,28 @@ class Config:
         os.environ.get("PASSWORD_RESET_TOKEN_MAX_AGE", 3600)
     )
 
+    # Deployment profile. These values contain public site identity only. Customer
+    # data, database credentials, OAuth secrets, Stripe secrets, and SMTP passwords
+    # remain per-deployment Railway variables.
+    SITE_PROFILE = SITE_PROFILE_VALUES["key"]
+    BRAND_NAME = SITE_PROFILE_VALUES["brand_name"]
+    BRAND_TAGLINE = SITE_PROFILE_VALUES["brand_tagline"]
+    BRAND_LOCATION = SITE_PROFILE_VALUES["brand_location"]
+    BRAND_DESCRIPTION = SITE_PROFILE_VALUES["brand_description"]
+    BRAND_LOGO_PATH = SITE_PROFILE_VALUES["logo_path"]
+    BRAND_LOGO_LIGHT_PATH = SITE_PROFILE_VALUES["logo_light_path"]
+    BRAND_LOGO_ALT = SITE_PROFILE_VALUES["logo_alt"]
+    BRAND_FLORALS_LABEL = SITE_PROFILE_VALUES["florals_label"]
+    BRAND_PHONE_DISPLAY = SITE_PROFILE_VALUES["phone_display"]
+    BRAND_PHONE_URI = SITE_PROFILE_VALUES["phone_uri"]
+    BRAND_CONTACT_EMAIL = SITE_PROFILE_VALUES["contact_email"]
+    BRAND_ADDRESS_LINES = SITE_PROFILE_VALUES["address_lines"]
+    BRAND_ADDRESS = SITE_PROFILE_VALUES["address"]
+    BRAND_AREA_SERVED = SITE_PROFILE_VALUES["area_served"]
+    BRAND_PACKAGE_NAV = SITE_PROFILE_VALUES["package_nav"]
+    BRAND_VENUE_NAV = SITE_PROFILE_VALUES["venue_nav"]
+    BRAND_SOCIAL = SITE_PROFILE_VALUES["social"]
+
     # Mail
     MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
     MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
@@ -74,11 +99,13 @@ class Config:
     MAIL_TIMEOUT = int(os.environ.get("MAIL_TIMEOUT", 8))
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "info@eldaweddingsites.example")
-    CONTACT_RECIPIENT = os.environ.get(
-        "CONTACT_RECIPIENT", "admin@eldaweddingsites.com"
+    MAIL_DEFAULT_SENDER = os.environ.get(
+        "MAIL_DEFAULT_SENDER", SITE_PROFILE_VALUES["mail_default_sender"]
     )
-    SITE_URL = os.environ.get("SITE_URL", "https://eldaweddingsites.example")
+    CONTACT_RECIPIENT = os.environ.get(
+        "CONTACT_RECIPIENT", SITE_PROFILE_VALUES["contact_email"]
+    )
+    SITE_URL = os.environ.get("SITE_URL", SITE_PROFILE_VALUES["site_url"])
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
     ENFORCE_CANONICAL_HOST = os.environ.get("ENFORCE_CANONICAL_HOST", "True") == "True"
     CLIENT_SELF_REGISTRATION_ENABLED = (
@@ -129,7 +156,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Keep production boot resilient if DATABASE_URL is temporarily missing.
+    # Railway startup validates that a deployment has an explicit database URL.
+    # The fallback remains useful for local production-mode smoke tests only.
     SQLALCHEMY_DATABASE_URI = _normalize_database_url(
         _get_database_url() or f"sqlite:///{os.path.join(BASE_DIR, 'bbb_prod_fallback.db')}"
     )
