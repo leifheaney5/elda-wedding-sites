@@ -1,5 +1,6 @@
 import os
 from app import create_app
+from app.utils.site_branding import install_site_profile_runtime
 
 
 def _resolve_env() -> str:
@@ -13,6 +14,7 @@ def _resolve_env() -> str:
 
 
 app = create_app(_resolve_env())
+install_site_profile_runtime(app)
 
 if __name__ == "__main__":
     app.run(
