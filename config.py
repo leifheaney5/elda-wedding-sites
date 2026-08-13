@@ -92,6 +92,12 @@ class Config:
     BRAND_VENUE_NAV = SITE_PROFILE_VALUES["venue_nav"]
     BRAND_SOCIAL = SITE_PROFILE_VALUES["social"]
 
+    # Optional origin for deployment-owned images. When set, requests under
+    # /static/images/* are redirected there while shared CSS/JS remain local.
+    # This allows a client deployment to keep its production photo library outside
+    # the canonical code repository without duplicating application logic.
+    ASSET_BASE_URL = os.environ.get("ASSET_BASE_URL", "").strip().rstrip("/")
+
     # Mail
     MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
     MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
