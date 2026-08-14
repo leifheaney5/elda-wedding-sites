@@ -3,26 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% set brand_name = config['BRAND_NAME'] %}
+  {% set brand_tagline = config['BRAND_TAGLINE'] %}
+  {% set brand_description = config['BRAND_DESCRIPTION'] %}
+  {% set brand_logo_path = config['BRAND_LOGO_PATH'] %}
+  {% set brand_logo_url = site_url ~ url_for('static', filename=brand_logo_path) if site_url else url_for('static', filename=brand_logo_path, _external=True) %}
   {% set base_title = self.title()|striptags|trim %}
-  {% set full_title = base_title ~ " | Wedding Template" if base_title else "ELDA Wedding Sites | Wedding Template" %}
+  {% set full_title = base_title ~ " | " ~ brand_name if base_title else brand_name ~ " | " ~ brand_tagline %}
   {% set canonical_url = (site_url ~ request.path) if site_url else request.base_url %}
-  {% set default_desc = "Template wedding website with reusable package, venue, planning, and inquiry flows for customization." %}
+  {% set default_desc = brand_description %}
   {% set robots_value = "noindex, nofollow" if request.path.startswith('/admin') or request.path.startswith('/client') else "index, follow" %}
   <title>{{ full_title }}</title>
   <meta name="description" content="{% block meta_desc %}{{ default_desc }}{% endblock %}" />
   <meta name="robots" content="{% block meta_robots %}{{ robots_value }}{% endblock %}" />
-  <meta name="author" content="ELDA Wedding Sites" />
+  <meta name="author" content="{{ brand_name }}" />
   <meta name="theme-color" content="#88A096" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="ELDA Wedding Sites" />
+  <meta property="og:site_name" content="{{ brand_name }}" />
   <meta property="og:title" content="{{ full_title }}" />
   <meta property="og:description" content="{% block og_desc %}{{ default_desc }}{% endblock %}" />
   <meta property="og:url" content="{{ canonical_url }}" />
-  <meta property="og:image" content="{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}" />
+  <meta property="og:image" content="{{ brand_logo_url }}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ full_title }}" />
   <meta name="twitter:description" content="{% block twitter_desc %}{{ default_desc }}{% endblock %}" />
-  <meta name="twitter:image" content="{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}" />
+  <meta name="twitter:image" content="{{ brand_logo_url }}" />
   {% if site_url %}
   <link rel="canonical" href="{{ canonical_url }}" />
   {% endif %}
@@ -41,20 +46,20 @@
   {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": "ELDA Wedding Sites",
-    "url": "{{ site_url }}",
-    "image": "{{ site_url ~ url_for('static', filename='images/logo/elda-logo-primary.svg') if site_url else url_for('static', filename='images/logo/elda-logo-primary.svg', _external=True) }}",
-    "telephone": "+1-443-614-4783",
-    "email": "info@eldaweddingsites.com",
+    "name": {{ config['BRAND_NAME']|tojson }},
+    "url": {{ site_url|tojson }},
+    "image": {{ brand_logo_url|tojson }},
+    "telephone": {{ config['BRAND_PHONE_URI']|tojson }},
+    "email": {{ config['BRAND_CONTACT_EMAIL']|tojson }},
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "123 Example Avenue Suite 100",
-      "addressLocality": "Example City",
-      "addressRegion": "ST",
-      "postalCode": "00000",
-      "addressCountry": "US"
+      "streetAddress": {{ config['BRAND_ADDRESS']['street']|tojson }},
+      "addressLocality": {{ config['BRAND_ADDRESS']['city']|tojson }},
+      "addressRegion": {{ config['BRAND_ADDRESS']['region']|tojson }},
+      "postalCode": {{ config['BRAND_ADDRESS']['postal_code']|tojson }},
+      "addressCountry": {{ config['BRAND_ADDRESS']['country']|tojson }}
     },
-    "areaServed": "Regional service area",
+    "areaServed": {{ config['BRAND_AREA_SERVED']|tojson }},
     "priceRange": "$$"
   }
   </script>
