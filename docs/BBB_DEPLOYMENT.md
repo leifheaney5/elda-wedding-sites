@@ -17,6 +17,28 @@ Railway project: `bbb-wedding-website`
 - BBB and ELDA never share a production database or secrets.
 - Do not remove `bbb-assets` while the canonical deployment depends on it.
 
+## Cost-optimized asset origin
+
+The legacy BBB repository now includes a dedicated nginx-only asset runtime:
+
+- `Dockerfile.assets`
+- `nginx.assets.conf.template`
+- `railway.assets.json`
+
+For the Railway `bbb-assets` service, set the service's Railway config-file path to
+`railway.assets.json` and redeploy. That image contains only nginx plus
+`app/static/images`; it does not boot the wedding application, connect to Postgres,
+or initialize auth/mail/Stripe code. The public URL contract remains
+`/static/images/<filename>` and `/healthz` is available for Railway health checks.
+
+After cutover, smoke-test representative production photos through the exact
+`ASSET_BASE_URL` used by `web-canonical` before considering the old asset runtime
+fully replaced.
+
+The legacy `web` service is rollback-only. Prefer Railway Serverless/app sleeping
+for it while rollback retention is still desired; remove it only after an explicit
+rollback-retention decision.
+
 ## Release check
 
 1. Verify `web-canonical`, `bbb-assets`, and `Postgres` are healthy.
