@@ -39,6 +39,10 @@ def main() -> int:
         "gunicorn",
         "--bind",
         f"0.0.0.0:{port}",
+        "--workers",
+        "1",
+        "--threads",
+        "4",
         "run:app",
     ]
     os.execvp(sys.executable, gunicorn_argv)
